@@ -3,18 +3,8 @@
 
 <PageTitle>Factorial</PageTitle>
 <h3>Factoril</h3>
-<input type="number" min="0" @bind="n" @bind:after ="Calculate"/>
-<div>@n! = @factorial</div>
+<div class="factorial">
+    <input type="number" min="0" max="50" @bind="n" @bind:after="Calculate" />
+    <div class="factorial-result">@n! = @factorial</div>
+</div>
 
-@code {
-    int n;
-    int factorial;
-    void Calculate()
-    {
-        factorial = 1;    
-        for (int i = 1; i <= n; i++)
-        {
-            factorial *= i;
-        }
-    }
-}
