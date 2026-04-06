@@ -1,0 +1,15 @@
+﻿@page "/power"
+@rendermode InteractiveServer
+
+<PageTitle>Power</PageTitle>
+<h3>Power</h3>
+
+<div class="power">
+    <label>Число:</label>
+    <input type="number" min="-100" max="100" @bind="num" @bind:after="Calculate" />
+
+    <label>Степень:</label>
+    <input type="number" min="-100" max="100" @bind="pow" @bind:after="Calculate" />
+
+    <div class="power-result">= @result</div>
+</div>
