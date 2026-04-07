@@ -1,0 +1,10 @@
+﻿@page "/fibonacci"
+@rendermode InteractiveServer
+
+<PageTitle>Fibonacci</PageTitle>
+<h3>Fibonacci</h3>
+
+<div class="fibonacci">
+    <input type="number" min="0" max="50" @bind="n" @bind:after="FibonacciSeries" />
+    <div class="fibonacci-result">@fibonacciResult</div>
+</div>
