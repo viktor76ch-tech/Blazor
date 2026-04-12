@@ -4,10 +4,11 @@
 
 <h3>TODO</h3>
 <div class="statistics">
-    <h4>Всего заданий: @tasklist.Count</h4>
-    <h4>Выполненных заданий: @tasklist.Where(task => task.DONE ==true).ToList().Count</h4>
-    <h4>Осталось: @tasklist.Where(task => task.DONE ==false).ToList().Count</h4>
+    <h5>Всего заданий: @tasklist.Count</h5>
+    <h5>Выполненных заданий: @tasklist.Where(task => task.DONE ==true).ToList().Count</h5>
+    <h5>Осталось: @tasklist.Where(task => task.DONE ==false).ToList().Count</h5>
 </div>
+
 <input placeholder ="Новая задача" @bind="task" @onkeyup="Enter"/>
 <button @onclick="AddTask">Добавить</button>
 <ul class="tasklist">
