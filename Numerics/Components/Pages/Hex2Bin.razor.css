@@ -1,0 +1,78 @@
+﻿
+.converter-card {
+    border: 1px solid #8BC6C6;
+    border-radius: 8px;
+    margin: 20px;
+    box-shadow: 0 2px 8px rgba(168, 237, 234, 0.2);
+    background-color: white;
+}
+
+.card-header {
+    background-color: #a8edea;
+    color: #00695C;
+    padding: 20px;
+    border-radius: 8px 8px 0 0;
+    border-bottom: 3px solid #8BC6C6;
+}
+
+    .card-header h3 {
+        margin: 0;
+        font-size: 1.5rem;
+    }
+
+.card-body {
+    padding: 25px;
+}
+
+.input-group {
+    margin-bottom: 25px;
+}
+
+.input-label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #00796B;
+    font-size: 1.1rem;
+}
+
+.text-input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #D4F1F1;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-family: 'Courier New', monospace;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+    .text-input:focus {
+        outline: none;
+        border-color: #8BC6C6;
+        box-shadow: 0 0 5px rgba(139, 198, 198, 0.3);
+    }
+
+.result-group {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 2px solid #D4F1F1;
+}
+
+    .result-group h4 {
+        color: #00695C;
+        font-size: 1.2rem;
+    }
+
+.result-value {
+    display: inline-block;
+    background-color: #a8edea;
+    color: #004D40;
+    padding: 8px 15px;
+    border-radius: 6px;
+    font-family: 'Courier New', monospace;
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin-left: 10px;
+    word-break: break-all;
+}

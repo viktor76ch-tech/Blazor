@@ -1,0 +1,24 @@
+﻿@page "/bin2Dec"
+@rendermode InteractiveServer
+@namespace Numerics.Components.Pages
+
+<PageTitle>Bin2Dec</PageTitle>
+
+<div class="converter-card">
+    <div class="card-header">
+        <h3>Двоичное → Десятичное</h3>
+    </div>
+    <div class="card-body">
+        <div class="input-group">
+            <label class="input-label">Введите двоичное число:</label>
+            <input type="text"
+                   class="text-input"
+                   @bind="BinaryInput"
+                   @bind:event="oninput"
+                   placeholder="Пример: 1010" />
+        </div>
+        <div class="result-group">
+            <h4>Результат: <span class="result-value">@DecimalResult</span></h4>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,24 @@
+﻿@page "/hex2Dec"
+@rendermode InteractiveServer
+@namespace Numerics.Components.Pages
+
+<PageTitle>Hex2Dec</PageTitle>
+
+<div class="converter-card">
+    <div class="card-header">
+        <h3>Шестнадцатеричное → Десятичное</h3>
+    </div>
+    <div class="card-body">
+        <div class="input-group">
+            <label class="input-label">Введите шестнадцатеричное число:</label>
+            <input type="text"
+                   class="text-input"
+                   @bind="HexInput"
+                   @bind:event="oninput"
+                   placeholder="Пример: 1A" />
+        </div>
+        <div class="result-group">
+            <h4>Результат: <span class="result-value">@DecimalResult</span></h4>
+        </div>
+    </div>
+</div>
