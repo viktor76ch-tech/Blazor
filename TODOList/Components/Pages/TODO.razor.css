@@ -13,3 +13,44 @@
     display:flex;
     justify-content:space-between;
 }
+
+.add-btn {
+    margin-left: 10px;
+    padding: 2px 8px;
+    background-color: #b3e5b3;
+    color: #000000;
+    border-width: 1px;
+    border-color: #000000;
+    cursor: pointer;
+}
+    .add-btn:hover {
+        background-color: #79d27b;
+    }
+
+.delete-btn {
+    margin-left: 10px;
+    padding: 0px 6px;
+    background-color: #e57373;
+    color: #ffffff;
+    border-width: 1px;
+    border-color: #000000;
+    cursor: pointer;
+}
+
+    .delete-btn:hover {
+        background-color: #f44336;
+    }
+
+.clear-btn {
+    margin-left: 10px;
+    padding: 2px 8px;
+    background-color: #e57373;
+    color: #000000;
+    border-width: 1px;
+    border-color: #000000;
+    cursor: pointer;
+}
+
+    .clear-btn:hover {
+        background-color: #f44336;
+    }

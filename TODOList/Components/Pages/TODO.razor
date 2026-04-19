@@ -10,13 +10,15 @@
 </div>
 
 <input placeholder ="Новая задача" @bind="task" @onkeyup="Enter"/>
-<button @onclick="AddTask">Добавить</button>
+<button @onclick="AddTask" class="add-btn">Добавить</button>
+<button @onclick="ClearCompleted" class="clear-btn">Удалить выполненные</button>
 <ul class="tasklist">
     @foreach (TODOitem i in tasklist)
     {
         <li>
             <input type="checkbox" @bind="@i.DONE" id="@i.Title" />
             <label for="@i.Title" class=@(i.DONE ? "done" : "")>@i.Title</label>
+            <button @onclick="() => DeleteTask(i)" class="delete-btn">Х</button>
         </li>    
     }
 </ul>
@@ -38,5 +40,17 @@
         {
             AddTask();
         }    
+    }
+
+    // Удаление отдельной задачи
+    void DeleteTask(TODOitem taskToDelete)
+    {
+        tasklist.Remove(taskToDelete);
+    }
+
+    // Удаление всех выполненных задач
+    void ClearCompleted()
+    {
+        tasklist.RemoveAll(task => task.DONE);
     }
 }
