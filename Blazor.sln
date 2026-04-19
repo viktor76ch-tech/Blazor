@@ -1,13 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 18
-VisualStudioVersion = 18.4.11626.88
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36811.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blazor", "Blazor\Blazor.csproj", "{D728D240-56BC-4B68-BE92-ECDF10663D55}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TODOList", "TODOList\TODOList.csproj", "{30A853DC-EE56-4AFA-A650-3FE2C409FB13}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Numerics", "Numerics\Numerics.csproj", "{9F136683-437F-4258-A379-BD32A3946A4F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Movies", "Movies\Movies.csproj", "{EA0B2273-A28D-41EE-8989-05DD2C5427E8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{9F136683-437F-4258-A379-BD32A3946A4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9F136683-437F-4258-A379-BD32A3946A4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9F136683-437F-4258-A379-BD32A3946A4F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA0B2273-A28D-41EE-8989-05DD2C5427E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA0B2273-A28D-41EE-8989-05DD2C5427E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA0B2273-A28D-41EE-8989-05DD2C5427E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA0B2273-A28D-41EE-8989-05DD2C5427E8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
