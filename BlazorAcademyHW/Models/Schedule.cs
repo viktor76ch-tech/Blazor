@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace BlazorAcademyHW.Models;
 
 public partial class Schedule
 {
+    [Key]
     public long LessonId { get; set; }
 
     public int Group { get; set; }

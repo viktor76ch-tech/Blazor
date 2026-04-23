@@ -1,0 +1,107 @@
+@page "/students/create"
+@inject BlazorAcademyHW.Data.BlazorAcademyHWContext DB
+@using BlazorAcademyHW.Models
+@inject NavigationManager NavigationManager
+@using System.IO
+@using System
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h4>Student</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm Model="Student" OnValidSubmit="AddStudent">
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
+
+            <div class="mb-3">
+                <label for="lastname" class="form-label">LastName:</label>
+                <InputText id="lastname" @bind-Value="Student.LastName" class="form-control" />
+                <ValidationMessage For="() => Student.LastName" class="text-danger" />
+            </div>
+
+            <div class="mb-3">
+                <label for="firstname" class="form-label">FirstName:</label>
+                <InputText id="firstname" @bind-Value="Student.FirstName" class="form-control" />
+                <ValidationMessage For="() => Student.FirstName" class="text-danger" />
+            </div>
+
+            <div class="mb-3">
+                <label for="middlename" class="form-label">MiddleName:</label>
+                <InputText id="middlename" @bind-Value="Student.MiddleName" class="form-control" />
+                <ValidationMessage For="() => Student.MiddleName" class="text-danger" />
+            </div>
+
+            <div class="mb-3">
+                <label for="birthdate" class="form-label">BirthDate:</label>
+                @* Используем InputDate с явным указанием типа DateOnly *@
+                <InputDate T="DateOnly" id="birthdate" @bind-Value="Student.BirthDate" class="form-control" />
+                <ValidationMessage For="() => Student.BirthDate" class="text-danger" />
+            </div>
+
+            <div class="mb-3">
+                <label for="email" class="form-label">Email:</label>
+                <InputText id="email" @bind-Value="Student.Email" class="form-control" />
+                <ValidationMessage For="() => Student.Email" class="text-danger" />
+            </div>
+
+            <div class="mb-3">
+                <label for="phone" class="form-label">Phone:</label>
+                <InputText id="phone" @bind-Value="Student.Phone" class="form-control" />
+                <ValidationMessage For="() => Student.Phone" class="text-danger" />
+            </div>
+
+            <div class="mb-3">
+                <label for="photo" class="form-label">Photo:</label>
+                @* Для byte[] используем InputFile *@
+                <InputFile id="photo" OnChange="OnFileSelected" class="form-control" />
+                @if (PhotoPreviewBase64 != null)
+                {
+                    <div class="mt-2">
+                        <img src="@PhotoPreviewBase64" alt="Preview" style="max-width: 200px; max-height: 200px;" />
+                    </div>
+                }
+                @* Валидация для Photo не поддерживается автоматически, поэтому убираем ValidationMessage *@
+            </div>
+
+            <div class="mb-3">
+                <label for="group" class="form-label">Group:</label>
+                <InputNumber T="int?" id="group" @bind-Value="Student.Group" class="form-control" />
+                <ValidationMessage For="() => Student.Group" class="text-danger" />
+            </div>
+
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/students">Back to List</a>
+</div>
+
+@code {
+    private Student Student { get; set; } = new();
+    private string? PhotoPreviewBase64;
+
+    private async Task OnFileSelected(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file != null)
+        {
+            using var memoryStream = new MemoryStream();
+            await file.OpenReadStream(maxAllowedSize: 5_242_880).CopyToAsync(memoryStream);
+            Student.Photo = memoryStream.ToArray();
+            PhotoPreviewBase64 = $"data:{file.ContentType};base64,{Convert.ToBase64String(Student.Photo)}";
+        }
+    }
+
+    private async Task AddStudent()
+    {
+        DB.Student.Add(Student);
+        await DB.SaveChangesAsync();
+        NavigationManager.NavigateTo("/students");
+    }
+}

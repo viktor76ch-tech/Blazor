@@ -1,0 +1,59 @@
+@page "/students/details"
+@inject BlazorAcademyHW.Data.BlazorAcademyHWContext DB
+@using BlazorAcademyHW.Models
+@inject NavigationManager NavigationManager
+@using Microsoft.EntityFrameworkCore
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h4>Student</h4>
+    <hr />
+    @if (student is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">LastName</dt>
+            <dd class="col-sm-10">@student.LastName</dd>
+            <dt class="col-sm-2">FirstName</dt>
+            <dd class="col-sm-10">@student.FirstName</dd>
+            <dt class="col-sm-2">MiddleName</dt>
+            <dd class="col-sm-10">@student.MiddleName</dd>
+            <dt class="col-sm-2">BirthDate</dt>
+            <dd class="col-sm-10">@student.BirthDate</dd>
+            <dt class="col-sm-2">Email</dt>
+            <dd class="col-sm-10">@student.Email</dd>
+            <dt class="col-sm-2">Phone</dt>
+            <dd class="col-sm-10">@student.Phone</dd>
+            <dt class="col-sm-2">Photo</dt>
+            <dd class="col-sm-10">@student.Photo</dd>
+            <dt class="col-sm-2">Group</dt>
+            <dd class="col-sm-10">@student.Group</dd>
+        </dl>
+        <div>
+            <a href="@($"/students/edit?studid={student.StudId}")">Edit</a> |
+            <a href="@($"/students")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    Student? student;
+
+    [SupplyParameterFromQuery]
+    public int StudId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        student = await DB.Student.FirstOrDefaultAsync(m => m.StudId == StudId);
+
+        if (student is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

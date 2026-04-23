@@ -1,8 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using BlazorAcademyHW.Components;
 using BlazorAcademyHW.Data;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<BlazorAcademyHWContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("BlazorAcademyHWContext") ?? throw new InvalidOperationException("Connection string 'BlazorAcademyHWContext' not found.")));
+
+builder.Services.AddQuickGridEntityFrameworkAdapter();;
 
 // Добавление сервиса DbContext
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");

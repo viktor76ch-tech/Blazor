@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace BlazorAcademyHW.Models;
 
 public partial class Teacher
 {
+    [Key]
     public short TeacherId { get; set; }
 
     public string? LastName { get; set; }

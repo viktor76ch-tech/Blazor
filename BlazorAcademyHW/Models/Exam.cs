@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace BlazorAcademyHW.Models;
 
 public partial class Exam
 {
+    [Key]
+    public int ExamId { get; set; }
     public int Student { get; set; }
 
     public short Discipline { get; set; }

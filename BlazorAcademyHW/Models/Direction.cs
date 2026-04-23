@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace BlazorAcademyHW.Models;
 
 public partial class Direction
 {
+    [Key]
     public byte DirectionId { get; set; }
 
     public string? DirectionName { get; set; }

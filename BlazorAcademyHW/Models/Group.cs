@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace BlazorAcademyHW.Models;
 
 public partial class Group
 {
+    [Key]
     public int GroupId { get; set; }
 
     public string? GroupName { get; set; }
