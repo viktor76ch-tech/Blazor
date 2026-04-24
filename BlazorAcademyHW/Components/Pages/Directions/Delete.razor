@@ -1,5 +1,5 @@
 @page "/directions/delete"
-@inject BlazorAcademyHW.Data.BlazorAcademyHWContext DB
+@inject BlazorAcademyHW.Data.Pd321Context DB
 @using BlazorAcademyHW.Models
 @inject NavigationManager NavigationManager
 @using Microsoft.EntityFrameworkCore
@@ -36,7 +36,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        direction = await DB.Direction.FirstOrDefaultAsync(m => m.DirectionId == DirectionId);
+        direction = await DB.Directions.FirstOrDefaultAsync(m => m.DirectionId == DirectionId);
 
         if (direction is null)
         {
@@ -46,7 +46,7 @@
 
     public async Task DeleteDirection()
     {
-        DB.Direction.Remove(direction!);
+        DB.Directions.Remove(direction!);
         await DB.SaveChangesAsync();
         NavigationManager.NavigateTo("/directions");
     }

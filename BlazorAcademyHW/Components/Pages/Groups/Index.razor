@@ -1,6 +1,6 @@
 @page "/groups"
 @using Microsoft.AspNetCore.Components.QuickGrid
-@inject BlazorAcademyHW.Data.BlazorAcademyHWContext DB
+@inject BlazorAcademyHW.Data.Pd321Context DB
 @using BlazorAcademyHW.Models
 
 <PageTitle>Index</PageTitle>
@@ -11,7 +11,7 @@
     <a href="groups/create">Create New</a>
 </p>
 
-<QuickGrid Class="table" Items="DB.Group">
+<QuickGrid Class="table" Items="DB.Groups">
     <PropertyColumn Property="group => group.GroupName" />
     <PropertyColumn Property="group => group.Direction" />
 

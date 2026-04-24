@@ -1,6 +1,6 @@
 @page "/disciplines"
 @using Microsoft.AspNetCore.Components.QuickGrid
-@inject BlazorAcademyHW.Data.BlazorAcademyHWContext DB
+@inject BlazorAcademyHW.Data.Pd321Context DB
 @using BlazorAcademyHW.Models
 
 <PageTitle>Index</PageTitle>
@@ -11,7 +11,7 @@
     <a href="disciplines/create">Create New</a>
 </p>
 
-<QuickGrid Class="table" Items="DB.Discipline">
+<QuickGrid Class="table" Items="DB.Disciplines">
     <PropertyColumn Property="discipline => discipline.DisciplineName" />
     <PropertyColumn Property="discipline => discipline.NumberOfLessons" />
 

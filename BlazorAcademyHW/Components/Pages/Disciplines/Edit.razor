@@ -1,5 +1,5 @@
 @page "/Disciplines/edit"
-@inject BlazorAcademyHW.Data.BlazorAcademyHWContext DB
+@inject BlazorAcademyHW.Data.Pd321Context DB
 @using BlazorAcademyHW.Models
 @inject NavigationManager NavigationManager
 @using Microsoft.EntityFrameworkCore
@@ -55,7 +55,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        Discipline = await DB.Discipline.FirstOrDefaultAsync(m => m.DisciplineId == DisciplineId);
+        Discipline = await DB.Disciplines.FirstOrDefaultAsync(m => m.DisciplineId == DisciplineId);
         
         if (Discipline is null)
         {
@@ -90,6 +90,6 @@ else
 
     private bool DisciplineExists(short disciplineid)
     {
-        return DB.Discipline.Any(e => e.DisciplineId == disciplineid);
+        return DB.Disciplines.Any(e => e.DisciplineId == disciplineid);
     }
 }

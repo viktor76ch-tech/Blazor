@@ -1,5 +1,5 @@
 @page "/groups/edit"
-@inject BlazorAcademyHW.Data.BlazorAcademyHWContext DB
+@inject BlazorAcademyHW.Data.Pd321Context DB
 @using BlazorAcademyHW.Models
 @inject NavigationManager NavigationManager
 @using Microsoft.EntityFrameworkCore
@@ -54,7 +54,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        Group = await DB.Group.FirstOrDefaultAsync(m => m.GroupId == GroupId);
+        Group = await DB.Groups.FirstOrDefaultAsync(m => m.GroupId == GroupId);
         
         if (Group is null)
         {
@@ -89,6 +89,6 @@ else
 
     private bool GroupExists(int groupId)
     {
-        return DB.Group.Any(e => e.GroupId == groupId);
+        return DB.Groups.Any(e => e.GroupId == groupId);
     }
 }

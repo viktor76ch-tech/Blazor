@@ -1,5 +1,5 @@
 @page "/disciplines/create"
-@inject BlazorAcademyHW.Data.BlazorAcademyHWContext DB
+@inject BlazorAcademyHW.Data.Pd321Context DB
 @using BlazorAcademyHW.Models
 @inject NavigationManager NavigationManager
 @using System.ComponentModel.DataAnnotations
@@ -50,7 +50,7 @@
 
     private async Task AddDiscipline()
     {
-        DB.Discipline.Add(Discipline);
+        DB.Disciplines.Add(Discipline);
         await DB.SaveChangesAsync();
         NavigationManager.NavigateTo("/disciplines");
     }

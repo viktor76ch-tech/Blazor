@@ -1,5 +1,5 @@
 @page "/teachers/details"
-@inject BlazorAcademyHW.Data.BlazorAcademyHWContext DB
+@inject BlazorAcademyHW.Data.Pd321Context DB
 @using BlazorAcademyHW.Models
 @inject NavigationManager NavigationManager
 @using Microsoft.EntityFrameworkCore
@@ -51,7 +51,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        teacher = await DB.Teacher.FirstOrDefaultAsync(m => m.TeacherId == TeacherId);
+        teacher = await DB.Teachers.FirstOrDefaultAsync(m => m.TeacherId == TeacherId);
 
         if (teacher is null)
         {

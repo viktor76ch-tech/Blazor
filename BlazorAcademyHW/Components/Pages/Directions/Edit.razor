@@ -1,5 +1,5 @@
 @page "/Directions/edit"
-@inject BlazorAcademyHW.Data.BlazorAcademyHWContext DB
+@inject BlazorAcademyHW.Data.Pd321Context DB
 @using BlazorAcademyHW.Models
 @inject NavigationManager NavigationManager
 @using Microsoft.EntityFrameworkCore
@@ -46,7 +46,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        Direction ??= await DB.Direction.FirstOrDefaultAsync(m => m.DirectionId == DirectionId);
+        Direction ??= await DB.Directions.FirstOrDefaultAsync(m => m.DirectionId == DirectionId);
 
         if (Direction is null)
         {
@@ -81,6 +81,6 @@ else
 
     bool DirectionExists(byte directionid)
     {
-        return DB.Direction.Any(e => e.DirectionId == directionid);
+        return DB.Directions.Any(e => e.DirectionId == directionid);
     }
 }

@@ -1,5 +1,5 @@
 @page "/groups/create"
-@inject BlazorAcademyHW.Data.BlazorAcademyHWContext DB
+@inject BlazorAcademyHW.Data.Pd321Context DB
 @using BlazorAcademyHW.Models
 @inject NavigationManager NavigationManager
 
@@ -43,7 +43,7 @@
 
     private async Task AddGroup()
     {
-        DB.Group.Add(Group);
+        DB.Groups.Add(Group);
         await DB.SaveChangesAsync();
         NavigationManager.NavigateTo("/groups");
     }

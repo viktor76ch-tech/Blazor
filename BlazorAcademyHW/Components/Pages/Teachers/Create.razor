@@ -1,5 +1,5 @@
 @page "/teachers/create"
-@inject BlazorAcademyHW.Data.BlazorAcademyHWContext DB
+@inject BlazorAcademyHW.Data.Pd321Context DB
 @using BlazorAcademyHW.Models
 @inject NavigationManager NavigationManager
 @using System.IO
@@ -109,7 +109,7 @@
 
     private async Task AddTeacher()
     {
-        DB.Teacher.Add(Teacher);
+        DB.Teachers.Add(Teacher);
         await DB.SaveChangesAsync();
         NavigationManager.NavigateTo("/teachers");
     }

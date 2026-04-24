@@ -1,5 +1,5 @@
 @page "/directions/create"
-@inject BlazorAcademyHW.Data.BlazorAcademyHWContext DB
+@inject BlazorAcademyHW.Data.Pd321Context DB
 @using BlazorAcademyHW.Models
 @inject NavigationManager NavigationManager
 
@@ -36,7 +36,7 @@
     // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
     public async Task AddDirection()
     {
-        DB.Direction.Add(Direction);
+        DB.Directions.Add(Direction);
         await DB.SaveChangesAsync();
         NavigationManager.NavigateTo("/directions");
     }

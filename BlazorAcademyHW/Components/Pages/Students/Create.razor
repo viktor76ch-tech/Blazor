@@ -15,7 +15,7 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <EditForm FormName="createStudentForm" Model="Student" OnValidSubmit="AddStudent">
+        <EditForm EditContext="@editContext" OnValidSubmit="AddStudent" FormName="createStudentForm">
             <DataAnnotationsValidator />
             <ValidationSummary class="text-danger" />
 
@@ -27,7 +27,8 @@
 
             <div class="mb-3">
                 <label for="firstname" class="form-label">FirstName:</label>
-                <InputText id="firstname" @bind-Value="Student.FirstName" class="form-control" />
+                <InputText id="firstname" @bind-Value='Student.FirstName' class="form-control" />
+                <p>Сейчас в модели: @Student.FirstName</p>
                 <ValidationMessage For="() => Student.FirstName" class="text-danger" />
             </div>
 
@@ -82,8 +83,15 @@
 </div>
 
 @code {
-    private Student Student { get; set; } = new();
+    private Student Student { get; set; } = default!;
+    private EditContext? editContext;
     private string? PhotoPreviewBase64;
+
+    protected override void OnInitialized()
+    {
+        Student = new Student();
+        editContext = new EditContext(Student);
+    }
 
     private async Task OnFileSelected(InputFileChangeEventArgs e)
     {
@@ -99,6 +107,9 @@
 
     private async Task AddStudent()
     {
+        // Диагностика – проверяем, что данные пришли
+        Console.WriteLine($"FirstName: '{Student.FirstName}', LastName: '{Student.LastName}'");
+
         DB.Students.Add(Student);
         await DB.SaveChangesAsync();
         NavigationManager.NavigateTo("/students");

@@ -1,5 +1,5 @@
 @page "/disciplines/delete"
-@inject BlazorAcademyHW.Data.BlazorAcademyHWContext DB
+@inject BlazorAcademyHW.Data.Pd321Context DB
 @using BlazorAcademyHW.Models
 @inject NavigationManager NavigationManager
 @using Microsoft.EntityFrameworkCore
@@ -40,7 +40,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        discipline = await DB.Discipline.FirstOrDefaultAsync(m => m.DisciplineId == DisciplineId);
+        discipline = await DB.Disciplines.FirstOrDefaultAsync(m => m.DisciplineId == DisciplineId);
 
         if (discipline is null)
         {
@@ -50,7 +50,7 @@
 
     public async Task DeleteDiscipline()
     {
-        DB.Discipline.Remove(discipline!);
+        DB.Disciplines.Remove(discipline!);
         await DB.SaveChangesAsync();
         NavigationManager.NavigateTo("/disciplines");
     }

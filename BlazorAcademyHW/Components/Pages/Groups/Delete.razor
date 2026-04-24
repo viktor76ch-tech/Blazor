@@ -1,5 +1,5 @@
 @page "/groups/delete"
-@inject BlazorAcademyHW.Data.BlazorAcademyHWContext DB
+@inject BlazorAcademyHW.Data.Pd321Context DB
 @using BlazorAcademyHW.Models
 @inject NavigationManager NavigationManager
 @using Microsoft.EntityFrameworkCore
@@ -40,7 +40,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        group = await DB.Group.FirstOrDefaultAsync(m => m.GroupId == GroupId);
+        group = await DB.Groups.FirstOrDefaultAsync(m => m.GroupId == GroupId);
 
         if (group is null)
         {
@@ -50,7 +50,7 @@
 
     public async Task DeleteGroup()
     {
-        DB.Group.Remove(group!);
+        DB.Groups.Remove(group!);
         await DB.SaveChangesAsync();
         NavigationManager.NavigateTo("/groups");
     }

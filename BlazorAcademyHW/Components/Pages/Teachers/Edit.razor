@@ -1,5 +1,5 @@
 @page "/Teachers/edit"
-@inject BlazorAcademyHW.Data.BlazorAcademyHWContext DB
+@inject BlazorAcademyHW.Data.Pd321Context DB
 @using BlazorAcademyHW.Models
 @inject NavigationManager NavigationManager
 @using Microsoft.EntityFrameworkCore
@@ -112,7 +112,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        Teacher = await DB.Teacher.FirstOrDefaultAsync(m => m.TeacherId == TeacherId);
+        Teacher = await DB.Teachers.FirstOrDefaultAsync(m => m.TeacherId == TeacherId);
         
         if (Teacher is null)
         {
@@ -159,6 +159,6 @@ else
 
     private bool TeacherExists(short teacherid)
     {
-        return DB.Teacher.Any(e => e.TeacherId == teacherid);
+        return DB.Teachers.Any(e => e.TeacherId == teacherid);
     }
 }
