@@ -1,5 +1,5 @@
 @page "/students/delete"
-@inject BlazorAcademyHW.Data.BlazorAcademyHWContext DB
+@inject BlazorAcademyHW.Data.Pd321Context DB
 @using BlazorAcademyHW.Models
 @inject NavigationManager NavigationManager
 @using Microsoft.EntityFrameworkCore
@@ -64,7 +64,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        student = await DB.Student.FirstOrDefaultAsync(m => m.StudId == StudId);
+        student = await DB.Students.FirstOrDefaultAsync(m => m.StudId == StudId);
 
         if (student is null)
         {
@@ -74,7 +74,7 @@
 
     public async Task DeleteStudent()
     {
-        DB.Student.Remove(student!);
+        DB.Students.Remove(student!);
         await DB.SaveChangesAsync();
         NavigationManager.NavigateTo("/students");
     }

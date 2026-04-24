@@ -1,5 +1,7 @@
 @page "/students/create"
-@inject BlazorAcademyHW.Data.BlazorAcademyHWContext DB
+@inject BlazorAcademyHW.Data.Pd321Context DB
+@using Microsoft.EntityFrameworkCore
+@using BlazorAcademyHW.Data
 @using BlazorAcademyHW.Models
 @inject NavigationManager NavigationManager
 @using System.IO
@@ -13,7 +15,7 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <EditForm Model="Student" OnValidSubmit="AddStudent">
+        <EditForm FormName="createStudentForm" Model="Student" OnValidSubmit="AddStudent">
             <DataAnnotationsValidator />
             <ValidationSummary class="text-danger" />
 
@@ -37,7 +39,6 @@
 
             <div class="mb-3">
                 <label for="birthdate" class="form-label">BirthDate:</label>
-                @* Используем InputDate с явным указанием типа DateOnly *@
                 <InputDate T="DateOnly" id="birthdate" @bind-Value="Student.BirthDate" class="form-control" />
                 <ValidationMessage For="() => Student.BirthDate" class="text-danger" />
             </div>
@@ -56,7 +57,6 @@
 
             <div class="mb-3">
                 <label for="photo" class="form-label">Photo:</label>
-                @* Для byte[] используем InputFile *@
                 <InputFile id="photo" OnChange="OnFileSelected" class="form-control" />
                 @if (PhotoPreviewBase64 != null)
                 {
@@ -64,7 +64,6 @@
                         <img src="@PhotoPreviewBase64" alt="Preview" style="max-width: 200px; max-height: 200px;" />
                     </div>
                 }
-                @* Валидация для Photo не поддерживается автоматически, поэтому убираем ValidationMessage *@
             </div>
 
             <div class="mb-3">
@@ -100,7 +99,7 @@
 
     private async Task AddStudent()
     {
-        DB.Student.Add(Student);
+        DB.Students.Add(Student);
         await DB.SaveChangesAsync();
         NavigationManager.NavigateTo("/students");
     }

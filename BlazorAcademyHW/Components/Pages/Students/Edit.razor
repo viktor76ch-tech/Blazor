@@ -1,5 +1,5 @@
 @page "/Students/edit"
-@inject BlazorAcademyHW.Data.BlazorAcademyHWContext DB
+@inject BlazorAcademyHW.Data.Pd321Context DB
 @using BlazorAcademyHW.Models
 @inject NavigationManager NavigationManager
 @using Microsoft.EntityFrameworkCore
@@ -21,7 +21,7 @@ else
 {
     <div class="row">
         <div class="col-md-4">
-            <EditForm Model="Student" OnValidSubmit="UpdateStudent">
+            <EditForm FormName="editStudentForm" Model="Student" OnValidSubmit="UpdateStudent">
                 <DataAnnotationsValidator />
                 <ValidationSummary class="text-danger" />
 
@@ -72,13 +72,11 @@ else
                     }
                     else if (Student.Photo != null && Student.Photo.Length > 0)
                     {
-                        // Отображаем существующее фото, если оно есть
                         var existingPreview = $"data:image/jpeg;base64,{Convert.ToBase64String(Student.Photo)}";
                         <div class="mt-2">
                             <img src="@existingPreview" alt="Current Photo" style="max-width: 200px; max-height: 200px;" />
                         </div>
                     }
-                    @* ValidationMessage для Photo убрано, т.к. InputFile не поддерживает автоматическую валидацию *@
                 </div>
 
                 <div class="mb-3">
@@ -102,11 +100,11 @@ else
     public int StudId { get; set; }
 
     private Student? Student { get; set; }
-    private string? PhotoPreviewBase64; // для превью нового выбранного файла
+    private string? PhotoPreviewBase64;
 
     protected override async Task OnInitializedAsync()
     {
-        Student = await DB.Student.FirstOrDefaultAsync(m => m.StudId == StudId);
+        Student = await DB.Students.FirstOrDefaultAsync(m => m.StudId == StudId);
         if (Student is null)
         {
             NavigationManager.NavigateTo("notfound");
@@ -152,6 +150,6 @@ else
 
     private bool StudentExists(int studid)
     {
-        return DB.Student.Any(e => e.StudId == studid);
+        return DB.Students.Any(e => e.StudId == studid);
     }
 }
