@@ -1,0 +1,95 @@
+@page "/Disciplines/edit"
+@inject BlazorAcademyHW.Data.BlazorAcademyHWContext DB
+@using BlazorAcademyHW.Models
+@inject NavigationManager NavigationManager
+@using Microsoft.EntityFrameworkCore
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h4>Discipline</h4>
+<hr />
+
+@if (Discipline is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm Model="Discipline" OnValidSubmit="UpdateDiscipline">
+                <DataAnnotationsValidator />
+                <ValidationSummary class="text-danger" />
+                
+                <div class="mb-3">
+                    <label for="disciplinename" class="form-label">DisciplineName:</label>
+                    <InputText id="disciplinename" @bind-Value="Discipline.DisciplineName" class="form-control" />
+                    <ValidationMessage For="() => Discipline.DisciplineName" class="text-danger" />
+                </div>
+                
+                <div class="mb-3">
+                    <label for="numberoflessons" class="form-label">NumberOfLessons:</label>
+                    @* Используем обычный input type="number" вместо InputText *@
+                    <input type="number" id="numberoflessons" @bind="Discipline.NumberOfLessons"
+                           class="form-control" min="1" max="255" step="1" />
+                    <ValidationMessage For="() => Discipline.NumberOfLessons" class="text-danger" />
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/disciplines">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    public short DisciplineId { get; set; }
+    
+    private Discipline? Discipline { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Discipline = await DB.Discipline.FirstOrDefaultAsync(m => m.DisciplineId == DisciplineId);
+        
+        if (Discipline is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    private async Task UpdateDiscipline()
+    {
+        if (Discipline is null) return;
+        
+        DB.Attach(Discipline).State = EntityState.Modified;
+
+        try
+        {
+            await DB.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!DisciplineExists(Discipline.DisciplineId))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/disciplines");
+    }
+
+    private bool DisciplineExists(short disciplineid)
+    {
+        return DB.Discipline.Any(e => e.DisciplineId == disciplineid);
+    }
+}

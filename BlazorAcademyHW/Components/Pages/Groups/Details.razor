@@ -1,0 +1,47 @@
+@page "/groups/details"
+@inject BlazorAcademyHW.Data.BlazorAcademyHWContext DB
+@using BlazorAcademyHW.Models
+@inject NavigationManager NavigationManager
+@using Microsoft.EntityFrameworkCore
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h4>Group</h4>
+    <hr />
+    @if (group is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">GroupName</dt>
+            <dd class="col-sm-10">@group.GroupName</dd>
+            <dt class="col-sm-2">Direction</dt>
+            <dd class="col-sm-10">@group.Direction</dd>
+        </dl>
+        <div>
+            <a href="@($"/groups/edit?groupid={group.GroupId}")">Edit</a> |
+            <a href="@($"/groups")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    Group? group;
+
+    [SupplyParameterFromQuery]
+    public int GroupId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        group = await DB.Group.FirstOrDefaultAsync(m => m.GroupId == GroupId);
+
+        if (group is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

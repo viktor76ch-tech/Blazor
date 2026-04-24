@@ -1,0 +1,47 @@
+@page "/disciplines/details"
+@inject BlazorAcademyHW.Data.BlazorAcademyHWContext DB
+@using BlazorAcademyHW.Models
+@inject NavigationManager NavigationManager
+@using Microsoft.EntityFrameworkCore
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h4>Discipline</h4>
+    <hr />
+    @if (discipline is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">DisciplineName</dt>
+            <dd class="col-sm-10">@discipline.DisciplineName</dd>
+            <dt class="col-sm-2">NumberOfLessons</dt>
+            <dd class="col-sm-10">@discipline.NumberOfLessons</dd>
+        </dl>
+        <div>
+            <a href="@($"/disciplines/edit?disciplineid={discipline.DisciplineId}")">Edit</a> |
+            <a href="@($"/disciplines")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    Discipline? discipline;
+
+    [SupplyParameterFromQuery]
+    public short DisciplineId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        discipline = await DB.Discipline.FirstOrDefaultAsync(m => m.DisciplineId == DisciplineId);
+
+        if (discipline is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

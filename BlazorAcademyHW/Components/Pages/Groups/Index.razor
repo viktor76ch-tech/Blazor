@@ -1,0 +1,23 @@
+@page "/groups"
+@using Microsoft.AspNetCore.Components.QuickGrid
+@inject BlazorAcademyHW.Data.BlazorAcademyHWContext DB
+@using BlazorAcademyHW.Models
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="groups/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="DB.Group">
+    <PropertyColumn Property="group => group.GroupName" />
+    <PropertyColumn Property="group => group.Direction" />
+
+    <TemplateColumn Context="group">
+        <a href="@($"groups/edit?groupid={group.GroupId}")">Edit</a> |
+        <a href="@($"groups/details?groupid={group.GroupId}")">Details</a> |
+        <a href="@($"groups/delete?groupid={group.GroupId}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>

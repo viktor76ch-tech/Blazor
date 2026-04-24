@@ -1,0 +1,57 @@
+@page "/disciplines/create"
+@inject BlazorAcademyHW.Data.BlazorAcademyHWContext DB
+@using BlazorAcademyHW.Models
+@inject NavigationManager NavigationManager
+@using System.ComponentModel.DataAnnotations
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h4>Discipline</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm Model="Discipline" OnValidSubmit="AddDiscipline">
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
+            
+            <div class="mb-3">
+                <label for="disciplinename" class="form-label">DisciplineName:</label>
+                <InputText id="disciplinename" @bind-Value="Discipline.DisciplineName" class="form-control" />
+                <ValidationMessage For="() => Discipline.DisciplineName" class="text-danger" />
+            </div>
+            
+            <div class="mb-3">
+                <label for="numberoflessons" class="form-label">NumberOfLessons:</label>
+                @* Используем int вместо byte и конвертируем *@
+                <InputNumber id="numberoflessons" @bind-Value="NumberOfLessonsInt" class="form-control" />
+                <ValidationMessage For="() => Discipline.NumberOfLessons" class="text-danger" />
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/disciplines">Back to List</a>
+</div>
+
+@code {
+    private Discipline Discipline { get; set; } = new();
+    
+    // Промежуточное свойство для работы с int
+    private int NumberOfLessonsInt
+    {
+        get => Discipline.NumberOfLessons;
+        set => Discipline.NumberOfLessons = (byte)value;
+    }
+
+    private async Task AddDiscipline()
+    {
+        DB.Discipline.Add(Discipline);
+        await DB.SaveChangesAsync();
+        NavigationManager.NavigateTo("/disciplines");
+    }
+}

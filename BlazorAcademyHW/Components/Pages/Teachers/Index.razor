@@ -1,0 +1,30 @@
+@page "/teachers"
+@using Microsoft.AspNetCore.Components.QuickGrid
+@inject BlazorAcademyHW.Data.BlazorAcademyHWContext DB
+@using BlazorAcademyHW.Models
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="teachers/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="DB.Teacher">
+    <PropertyColumn Property="teacher => teacher.LastName" />
+    <PropertyColumn Property="teacher => teacher.FirstName" />
+    <PropertyColumn Property="teacher => teacher.MiddleName" />
+    <PropertyColumn Property="teacher => teacher.BirthDate" />
+    <PropertyColumn Property="teacher => teacher.Email" />
+    <PropertyColumn Property="teacher => teacher.Phone" />
+    <PropertyColumn Property="teacher => teacher.Photo" />
+    <PropertyColumn Property="teacher => teacher.WorkSince" />
+    <PropertyColumn Property="teacher => teacher.Rate" />
+
+    <TemplateColumn Context="teacher">
+        <a href="@($"teachers/edit?teacherid={teacher.TeacherId}")">Edit</a> |
+        <a href="@($"teachers/details?teacherid={teacher.TeacherId}")">Details</a> |
+        <a href="@($"teachers/delete?teacherid={teacher.TeacherId}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>

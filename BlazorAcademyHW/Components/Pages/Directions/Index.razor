@@ -1,0 +1,22 @@
+@page "/directions"
+@using Microsoft.AspNetCore.Components.QuickGrid
+@inject BlazorAcademyHW.Data.BlazorAcademyHWContext DB
+@using BlazorAcademyHW.Models
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="directions/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="DB.Direction">
+    <PropertyColumn Property="direction => direction.DirectionName" />
+
+    <TemplateColumn Context="direction">
+        <a href="@($"directions/edit?directionid={direction.DirectionId}")">Edit</a> |
+        <a href="@($"directions/details?directionid={direction.DirectionId}")">Details</a> |
+        <a href="@($"directions/delete?directionid={direction.DirectionId}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>

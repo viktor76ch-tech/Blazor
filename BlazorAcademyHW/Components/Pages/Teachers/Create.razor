@@ -1,0 +1,116 @@
+@page "/teachers/create"
+@inject BlazorAcademyHW.Data.BlazorAcademyHWContext DB
+@using BlazorAcademyHW.Models
+@inject NavigationManager NavigationManager
+@using System.IO
+@using System
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h4>Teacher</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm Model="Teacher" OnValidSubmit="AddTeacher">
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
+            
+            <div class="mb-3">
+                <label for="lastname" class="form-label">LastName:</label>
+                <InputText id="lastname" @bind-Value="Teacher.LastName" class="form-control" />
+                <ValidationMessage For="() => Teacher.LastName" class="text-danger" />
+            </div>
+            
+            <div class="mb-3">
+                <label for="firstname" class="form-label">FirstName:</label>
+                <InputText id="firstname" @bind-Value="Teacher.FirstName" class="form-control" />
+                <ValidationMessage For="() => Teacher.FirstName" class="text-danger" />
+            </div>
+            
+            <div class="mb-3">
+                <label for="middlename" class="form-label">MiddleName:</label>
+                <InputText id="middlename" @bind-Value="Teacher.MiddleName" class="form-control" />
+                <ValidationMessage For="() => Teacher.MiddleName" class="text-danger" />
+            </div>
+            
+            <div class="mb-3">
+                <label for="birthdate" class="form-label">BirthDate:</label>
+                @* Для DateOnly? используем InputDate *@
+                <InputDate T="DateOnly?" id="birthdate" @bind-Value="Teacher.BirthDate" class="form-control" />
+                <ValidationMessage For="() => Teacher.BirthDate" class="text-danger" />
+            </div>
+            
+            <div class="mb-3">
+                <label for="email" class="form-label">Email:</label>
+                <InputText id="email" @bind-Value="Teacher.Email" class="form-control" />
+                <ValidationMessage For="() => Teacher.Email" class="text-danger" />
+            </div>
+            
+            <div class="mb-3">
+                <label for="phone" class="form-label">Phone:</label>
+                <InputText id="phone" @bind-Value="Teacher.Phone" class="form-control" />
+                <ValidationMessage For="() => Teacher.Phone" class="text-danger" />
+            </div>
+            
+            <div class="mb-3">
+                <label for="photo" class="form-label">Photo:</label>
+                @* Для byte[] используем InputFile *@
+                <InputFile id="photo" OnChange="OnFileSelected" class="form-control" />
+                @if (PhotoPreviewBase64 != null)
+                {
+                    <div class="mt-2">
+                        <img src="@PhotoPreviewBase64" alt="Preview" style="max-width: 200px; max-height: 200px;" />
+                    </div>
+                }
+                @* ValidationMessage для Photo убираем *@
+            </div>
+            
+            <div class="mb-3">
+                <label for="worksince" class="form-label">WorkSince:</label>
+                @* Для DateOnly? используем InputDate *@
+                <InputDate T="DateOnly?" id="worksince" @bind-Value="Teacher.WorkSince" class="form-control" />
+                <ValidationMessage For="() => Teacher.WorkSince" class="text-danger" />
+            </div>
+            
+            <div class="mb-3">
+                <label for="rate" class="form-label">Rate:</label>
+                @* Для decimal? используем input type="number" *@
+                <input type="number" id="rate" @bind="Teacher.Rate"
+                       class="form-control" step="0.01" min="0" max="100" />
+                <ValidationMessage For="() => Teacher.Rate" class="text-danger" />
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/teachers">Back to List</a>
+</div>
+
+@code {
+    private Teacher Teacher { get; set; } = new();
+    private string? PhotoPreviewBase64;
+
+    private async Task OnFileSelected(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file != null)
+        {
+            using var memoryStream = new MemoryStream();
+            await file.OpenReadStream(maxAllowedSize: 5_242_880).CopyToAsync(memoryStream);
+            Teacher.Photo = memoryStream.ToArray();
+            PhotoPreviewBase64 = $"data:{file.ContentType};base64,{Convert.ToBase64String(Teacher.Photo)}";
+        }
+    }
+
+    private async Task AddTeacher()
+    {
+        DB.Teacher.Add(Teacher);
+        await DB.SaveChangesAsync();
+        NavigationManager.NavigateTo("/teachers");
+    }
+}
