@@ -7,6 +7,7 @@ namespace BlazorAcademyHW.Models
     {
         [Key]
         [Column("direction_id")]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public byte DirectionId { get; set; }
 
         [Column("direction_name")]

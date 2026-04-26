@@ -13,7 +13,7 @@ namespace BlazorAcademyHW.Models
         public string? GroupName { get; set; }
 
         [Column("direction")]
-        public int? Direction { get; set; }
+        public byte? Direction { get; set; }
 
     }
 }
