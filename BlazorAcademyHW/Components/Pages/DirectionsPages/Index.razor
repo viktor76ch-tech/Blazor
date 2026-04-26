@@ -1,0 +1,36 @@
+﻿@page "/directions"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using BlazorAcademyHW.Models
+@using BlazorAcademyHW.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<BlazorAcademyHW.Data.BlazorAcademyHWContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="directions/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Directions">
+    <PropertyColumn Property="directions => directions.DirectionName" />
+
+    <TemplateColumn Context="directions">
+        <a href="@($"directions/edit?directionid={directions.DirectionId}")">Edit</a> |
+        <a href="@($"directions/details?directionid={directions.DirectionId}")">Details</a> |
+        <a href="@($"directions/delete?directionid={directions.DirectionId}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private BlazorAcademyHWContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

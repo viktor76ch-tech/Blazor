@@ -1,0 +1,94 @@
+﻿@page "/groups/edit"
+@using Microsoft.EntityFrameworkCore
+@using BlazorAcademyHW.Models
+@inject IDbContextFactory<BlazorAcademyHW.Data.BlazorAcademyHWContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Groups</h2>
+<hr />
+
+@if (Groups is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm Model="Groups" OnValidSubmit="UpdateGroups" FormName="edit-groups" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary class="text-danger" role="alert" />
+                
+                <div class="mb-3">
+                    <label for="groupname" class="form-label">GroupName:</label>
+                    <InputText id="groupname" @bind-Value="Groups.GroupName" class="form-control" />
+                    <ValidationMessage For="@(() => Groups.GroupName)" class="text-danger" />
+                </div>
+                
+                <div class="mb-3">
+                    <label for="direction" class="form-label">Direction:</label>
+                    <InputNumber id="direction" @bind-Value="Groups.Direction" class="form-control" />
+                    <ValidationMessage For="@(() => Groups.Direction)" class="text-danger" />
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/groups">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int GroupId { get; set; }
+
+    [SupplyParameterFromForm]
+    private Groups? Groups { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Groups ??= await context.Groups.FirstOrDefaultAsync(m => m.GroupId == GroupId);
+
+        if (Groups is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    private async Task UpdateGroups()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Groups.Update(Groups!);
+        
+        try
+        {
+            await context.SaveChangesAsync();
+            NavigationManager.NavigateTo("/groups");
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!await GroupsExists(Groups!.GroupId))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+    }
+
+    private async Task<bool> GroupsExists(int groupid)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return await context.Groups.AnyAsync(e => e.GroupId == groupid);
+    }
+}

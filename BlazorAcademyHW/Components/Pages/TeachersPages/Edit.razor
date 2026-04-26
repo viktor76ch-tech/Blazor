@@ -1,0 +1,130 @@
+﻿@page "/teachers/edit"
+@using Microsoft.EntityFrameworkCore
+@using BlazorAcademyHW.Models
+@inject IDbContextFactory<BlazorAcademyHW.Data.BlazorAcademyHWContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Teachers</h2>
+<hr />
+
+@if (Teachers is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm Model="Teachers" OnValidSubmit="UpdateTeachers" FormName="edit-teachers" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary class="text-danger" role="alert" />
+                
+                <div class="mb-3">
+                    <label for="lastname" class="form-label">LastName:</label>
+                    <InputText id="lastname" @bind-Value="Teachers.LastName" class="form-control" />
+                    <ValidationMessage For="@(() => Teachers.LastName)" class="text-danger" />
+                </div>
+                
+                <div class="mb-3">
+                    <label for="firstname" class="form-label">FirstName:</label>
+                    <InputText id="firstname" @bind-Value="Teachers.FirstName" class="form-control" />
+                    <ValidationMessage For="@(() => Teachers.FirstName)" class="text-danger" />
+                </div>
+                
+                <div class="mb-3">
+                    <label for="middlename" class="form-label">MiddleName:</label>
+                    <InputText id="middlename" @bind-Value="Teachers.MiddleName" class="form-control" />
+                    <ValidationMessage For="@(() => Teachers.MiddleName)" class="text-danger" />
+                </div>
+                
+                <div class="mb-3">
+                    <label for="birthdate" class="form-label">BirthDate:</label>
+                    <InputDate id="birthdate" @bind-Value="Teachers.BirthDate" class="form-control" />
+                    <ValidationMessage For="@(() => Teachers.BirthDate)" class="text-danger" />
+                </div>
+                
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email:</label>
+                    <InputText id="email" @bind-Value="Teachers.Email" class="form-control" />
+                    <ValidationMessage For="@(() => Teachers.Email)" class="text-danger" />
+                </div>
+                
+                <div class="mb-3">
+                    <label for="phone" class="form-label">Phone:</label>
+                    <InputText id="phone" @bind-Value="Teachers.Phone" class="form-control" />
+                    <ValidationMessage For="@(() => Teachers.Phone)" class="text-danger" />
+                </div>
+                
+                <div class="mb-3">
+                    <label for="worksince" class="form-label">WorkSince:</label>
+                    <InputDate id="worksince" @bind-Value="Teachers.WorkSince" class="form-control" />
+                    <ValidationMessage For="@(() => Teachers.WorkSince)" class="text-danger" />
+                </div>
+                
+                <div class="mb-3">
+                    <label for="rate" class="form-label">Rate:</label>
+                    <InputNumber id="rate" @bind-Value="Teachers.Rate" class="form-control" />
+                    <ValidationMessage For="@(() => Teachers.Rate)" class="text-danger" />
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/teachers">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private short TeacherId { get; set; }
+
+    [SupplyParameterFromForm]
+    private Teachers? Teachers { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Teachers ??= await context.Teachers.FirstOrDefaultAsync(m => m.TeacherId == TeacherId);
+
+        if (Teachers is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    private async Task UpdateTeachers()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Teachers.Update(Teachers!);
+        
+        try
+        {
+            await context.SaveChangesAsync();
+            NavigationManager.NavigateTo("/teachers");
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!await TeachersExists(Teachers!.TeacherId))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+    }
+
+    private async Task<bool> TeachersExists(short teacherid)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return await context.Teachers.AnyAsync(e => e.TeacherId == teacherid);
+    }
+}

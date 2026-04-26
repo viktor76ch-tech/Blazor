@@ -1,0 +1,51 @@
+﻿@page "/groups/create"
+@using Microsoft.EntityFrameworkCore
+@using BlazorAcademyHW.Models
+@inject IDbContextFactory<BlazorAcademyHW.Data.BlazorAcademyHWContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Groups</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm Model="Groups" OnValidSubmit="AddGroups" FormName="create-groups" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert" />
+            
+            <div class="mb-3">
+                <label for="groupname" class="form-label">GroupName:</label>
+                <InputText id="groupname" @bind-Value="Groups.GroupName" class="form-control" />
+                <ValidationMessage For="@(() => Groups.GroupName)" class="text-danger" />
+            </div>
+            
+            <div class="mb-3">
+                <label for="direction" class="form-label">Direction:</label>
+                <InputNumber id="direction" @bind-Value="Groups.Direction" class="form-control" />
+                <ValidationMessage For="@(() => Groups.Direction)" class="text-danger" />
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/groups">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Groups Groups { get; set; } = new();
+
+    private async Task AddGroups()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Groups.Add(Groups);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/groups");
+    }
+}

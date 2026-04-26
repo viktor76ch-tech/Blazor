@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,10 +14,10 @@ namespace BlazorAcademyHW.Data
         {
         }
 
-        public DbSet<BlazorAcademyHW.Models.Student> Student { get; set; } = default!;
-        public DbSet<BlazorAcademyHW.Models.Group> Group { get; set; } = default!;
-        public DbSet<BlazorAcademyHW.Models.Direction> Direction { get; set; } = default!;
-        public DbSet<BlazorAcademyHW.Models.Discipline> Discipline { get; set; } = default!;
-        public DbSet<BlazorAcademyHW.Models.Teacher> Teacher { get; set; } = default!;
+        public DbSet<BlazorAcademyHW.Models.Students> Students { get; set; } = default!;
+        public DbSet<BlazorAcademyHW.Models.Teachers> Teachers { get; set; } = default!;
+        public DbSet<BlazorAcademyHW.Models.Groups> Groups { get; set; } = default!;
+        public DbSet<BlazorAcademyHW.Models.Disciplines> Disciplines { get; set; } = default!;
+        public DbSet<BlazorAcademyHW.Models.Directions> Directions { get; set; } = default!;
     }
 }

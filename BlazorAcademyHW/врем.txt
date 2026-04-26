@@ -1,9 +1,0 @@
-dotnet aspnet-codegenerator blazor CRUD -m Student -dc BlazorAcademyHW.Data.BlazorAcademyHWContext -outDir Components/Pages/Students
-
-dotnet aspnet-codegenerator blazor CRUD -m Discipline -dc BlazorAcademyHW.Data.BlazorAcademyHWContext -outDir Components/Pages/Disciplines
-
-dotnet aspnet-codegenerator blazor CRUD -m Direction -dc BlazorAcademyHW.Data.BlazorAcademyHWContext -outDir Components/Pages/Directions
-
-dotnet aspnet-codegenerator blazor CRUD -m Group -dc BlazorAcademyHW.Data.BlazorAcademyHWContext -outDir Components/Pages/Groups
-
-dotnet aspnet-codegenerator blazor CRUD -m Teacher -dc BlazorAcademyHW.Data.BlazorAcademyHWContext -outDir Components/Pages/Teachers
