@@ -31,8 +31,8 @@ else
                 
                 <div class="mb-3">
                     <label for="direction" class="form-label">Direction:</label>
-                    <InputNumber id="direction" @bind-Value="Groups.Direction" class="form-control" />
-                    <ValidationMessage For="@(() => Groups.Direction)" class="text-danger" />
+                    <InputNumber id="direction" @bind-Value="Groups.DirectionInput" class="form-control" />
+                    <ValidationMessage For="@(() => Groups.DirectionInput)" class="text-danger" />
                 </div>
                 
                 <button type="submit" class="btn btn-primary">Save</button>

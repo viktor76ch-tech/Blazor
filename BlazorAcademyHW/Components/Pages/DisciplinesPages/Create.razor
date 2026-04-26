@@ -24,8 +24,8 @@
             
             <div class="mb-3">
                 <label for="numberoflessons" class="form-label">NumberOfLessons:</label>
-                <InputNumber id="numberoflessons" @bind-Value="Disciplines.NumberOfLessons" class="form-control" />
-                <ValidationMessage For="@(() => Disciplines.NumberOfLessons)" class="text-danger" />
+                <InputNumber id="numberoflessons" @bind-Value="Disciplines.NumberOfLessonsInput" class="form-control" />
+                <ValidationMessage For="@(() => Disciplines.NumberOfLessonsInput)" class="text-danger" />
             </div>
             
             <button type="submit" class="btn btn-primary">Create</button>

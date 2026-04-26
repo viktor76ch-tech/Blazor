@@ -15,5 +15,12 @@ namespace BlazorAcademyHW.Models
         [Column("direction")]
         public byte? Direction { get; set; }
 
+        [NotMapped]
+        public int DirectionInput
+        {
+            get => (int)Direction;
+            set => Direction = (byte)Math.Clamp(value, 0, 255);
+        }
+
     }
 }
