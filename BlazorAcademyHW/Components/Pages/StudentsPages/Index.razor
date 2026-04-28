@@ -14,29 +14,34 @@
     <a href="students/create">Create New</a>
 </p>
 
-<QuickGrid Class="table" Items="context.Students">
-    <PropertyColumn Property="students => students.LastName" />
-    <PropertyColumn Property="students => students.FirstName" />
-    <PropertyColumn Property="students => students.MiddleName" />
-    <PropertyColumn Property="students => students.BirthDate" />
-    <PropertyColumn Property="students => students.Email" />
-    <PropertyColumn Property="students => students.Phone" />
-    <PropertyColumn Property="students => students.Photo" />
-    <PropertyColumn Property="students => students.Group" />
+<QuickGrid Class="table" Items="studentsQuery" TGridItem="Students">
+    <PropertyColumn Property="s => s.LastName" />
+    <PropertyColumn Property="s => s.FirstName" />
+    <PropertyColumn Property="s => s.MiddleName" />
+    <PropertyColumn Property="s => s.BirthDate" />
+    <PropertyColumn Property="s => s.Email" />
+    <PropertyColumn Property="s => s.Phone" />
+    <PropertyColumn Property="s => s.Photo" />
+    <TemplateColumn Title="Группа" Context="student">
+        @(student.GroupNm?.GroupName ?? "—")
+    </TemplateColumn>
 
-    <TemplateColumn Context="students">
-        <a href="@($"students/edit?studid={students.StudId}")">Edit</a> |
-        <a href="@($"students/details?studid={students.StudId}")">Details</a> |
-        <a href="@($"students/delete?studid={students.StudId}")">Delete</a>
+    <TemplateColumn Context="student">
+        <a href="@($"students/edit?studid={student.StudId}")">Edit</a> |
+        <a href="@($"students/details?studid={student.StudId}")">Details</a> |
+        <a href="@($"students/delete?studid={student.StudId}")">Delete</a>
     </TemplateColumn>
 </QuickGrid>
 
 @code {
     private BlazorAcademyHWContext context = default!;
+    private IQueryable<Students> studentsQuery = default!;
 
     protected override void OnInitialized()
     {
         context = DbFactory.CreateDbContext();
+        studentsQuery = context.Students
+            .Include(s => s.GroupNm);
     }
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();
