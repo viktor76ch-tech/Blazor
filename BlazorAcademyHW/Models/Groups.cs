@@ -22,5 +22,7 @@ namespace BlazorAcademyHW.Models
             set => Direction = (byte)Math.Clamp(value, 0, 255);
         }
 
+        [ForeignKey(nameof(Direction))]
+        public Directions? DirectionNavigation { get; set; }
     }
 }

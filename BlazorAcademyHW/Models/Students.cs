@@ -36,5 +36,8 @@ namespace BlazorAcademyHW.Models
 
         [Column("group")]
         public int? Group { get; set; }
+
+        [ForeignKey("Group")]
+        public Groups? GroupNm { get; set; }
     }
 }

@@ -14,23 +14,27 @@
     <a href="groups/create">Create New</a>
 </p>
 
-<QuickGrid Class="table" Items="context.Groups">
-    <PropertyColumn Property="groups => groups.GroupName" />
-    <PropertyColumn Property="groups => groups.Direction" />
-
-    <TemplateColumn Context="groups">
-        <a href="@($"groups/edit?groupid={groups.GroupId}")">Edit</a> |
-        <a href="@($"groups/details?groupid={groups.GroupId}")">Details</a> |
-        <a href="@($"groups/delete?groupid={groups.GroupId}")">Delete</a>
+<QuickGrid Class="table" Items="groupsQuery" TGridItem="Groups">
+    <PropertyColumn Property="g => g.GroupName" />
+    <TemplateColumn Title="Направление" Context="group">
+        @(group.DirectionNavigation?.DirectionName ?? "—")
+    </TemplateColumn>
+    <TemplateColumn Context="g">
+        <a href="@($"groups/edit?groupid={g.GroupId}")">Edit</a> |
+        <a href="@($"groups/details?groupid={g.GroupId}")">Details</a> |
+        <a href="@($"groups/delete?groupid={g.GroupId}")">Delete</a>
     </TemplateColumn>
 </QuickGrid>
 
 @code {
     private BlazorAcademyHWContext context = default!;
+    private IQueryable<Groups> groupsQuery = default!;
 
     protected override void OnInitialized()
     {
         context = DbFactory.CreateDbContext();
+        groupsQuery = context.Groups
+            .Include(g => g.DirectionNavigation);
     }
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();
