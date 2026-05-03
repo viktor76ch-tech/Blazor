@@ -1,58 +1,81 @@
 ﻿@page "/students/details"
+@rendermode InteractiveServer
 @using Microsoft.EntityFrameworkCore
 @using BlazorAcademyHW.Models
-@inject IDbContextFactory<BlazorAcademyHW.Data.BlazorAcademyHWContext> DbFactory
+@using BlazorAcademyHW.Data
+@inject IDbContextFactory<BlazorAcademyHWContext> DbFactory
 @inject NavigationManager NavigationManager
 
-<PageTitle>Details</PageTitle>
+<PageTitle>Student Details</PageTitle>
 
-<h1>Details</h1>
+<h1>Student Details</h1>
 
 <div>
-    <h2>Students</h2>
     <hr />
-    @if (students is null)
+    @if (student is null)
     {
         <p><em>Loading...</em></p>
     }
-    else {
+    else
+    {
         <dl class="row">
-            <dt class="col-sm-2">LastName</dt>
-            <dd class="col-sm-10">@students.LastName</dd>
-            <dt class="col-sm-2">FirstName</dt>
-            <dd class="col-sm-10">@students.FirstName</dd>
-            <dt class="col-sm-2">MiddleName</dt>
-            <dd class="col-sm-10">@students.MiddleName</dd>
-            <dt class="col-sm-2">BirthDate</dt>
-            <dd class="col-sm-10">@students.BirthDate</dd>
-            <dt class="col-sm-2">Email</dt>
-            <dd class="col-sm-10">@students.Email</dd>
-            <dt class="col-sm-2">Phone</dt>
-            <dd class="col-sm-10">@students.Phone</dd>
-            <dt class="col-sm-2">Photo</dt>
-            <dd class="col-sm-10">@students.Photo</dd>
-            <dt class="col-sm-2">Group</dt>
-            <dd class="col-sm-10">@students.Group</dd>
+            <dt class="col-sm-3">Last Name</dt>
+            <dd class="col-sm-9">@student.LastName</dd>
+            
+            <dt class="col-sm-3">First Name</dt>
+            <dd class="col-sm-9">@student.FirstName</dd>
+            
+            <dt class="col-sm-3">Middle Name</dt>
+            <dd class="col-sm-9">@student.MiddleName</dd>
+            
+            <dt class="col-sm-3">Birth Date</dt>
+            <dd class="col-sm-9">@student.BirthDate.ToString("dd.MM.yyyy")</dd>
+            
+            <dt class="col-sm-3">Email</dt>
+            <dd class="col-sm-9">@(student.Email ?? "—")</dd>
+            
+            <dt class="col-sm-3">Phone</dt>
+            <dd class="col-sm-9">@(student.Phone ?? "—")</dd>
+            
+            <dt class="col-sm-3">Group</dt>
+            <dd class="col-sm-9">@(student.GroupNm?.GroupName ?? "No group")</dd>
+            
+            <dt class="col-sm-3">Photo</dt>
+            <dd class="col-sm-9">
+                @if (student.Photo != null && student.Photo.Length > 0)
+                {
+                    <img src="data:image/png;base64,@Convert.ToBase64String(student.Photo)"
+                         alt="Student photo" style="max-width: 300px;" class="img-thumbnail" />
+                }
+                else
+                {
+                    <span>No photo</span>
+                }
+            </dd>
         </dl>
-        <div>
-            <a href="@($"/students/edit?studid={students.StudId}")">Edit</a> |
-            <a href="@($"/students")">Back to List</a>
+        <div class="mt-3">
+            <a href="@($"/students/edit?studid={student.StudId}")" class="btn btn-primary">Edit</a>
+            <a href="/students" class="btn btn-secondary ms-2">Back to List</a>
         </div>
     }
 </div>
 
 @code {
-    private Students? students;
+    private Students? student;
 
     [SupplyParameterFromQuery]
     private int StudId { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        using var context = DbFactory.CreateDbContext();
-        students = await context.Students.FirstOrDefaultAsync(m => m.StudId == StudId);
+        using var context = await DbFactory.CreateDbContextAsync();
+        
+        // Загружаем студента вместе с информацией о группе
+        student = await context.Students
+            .Include(s => s.GroupNm)
+            .FirstOrDefaultAsync(m => m.StudId == StudId);
 
-        if (students is null)
+        if (student is null)
         {
             NavigationManager.NavigateTo("notfound");
         }

@@ -8,7 +8,7 @@ namespace BlazorAcademyHW.Models
         public int GroupId { get; set; }
 
         [Column("day_of_week")]
-        public byte DayOfWeek { get; set; } // 1 = Mon, 2 = Tue, ...
+        public byte DayOfWeek { get; set; }
 
         [ForeignKey("GroupId")]
         public Groups? Group { get; set; }

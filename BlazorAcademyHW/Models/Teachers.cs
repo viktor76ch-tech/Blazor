@@ -36,5 +36,6 @@ namespace BlazorAcademyHW.Models
 
         [Column("rate")]
         public decimal? Rate { get; set; }
+        public ICollection<TeachersDisciplines>? TeacherDisciplines { get; set; }
     }
 }

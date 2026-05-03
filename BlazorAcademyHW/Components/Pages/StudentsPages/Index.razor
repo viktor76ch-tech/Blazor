@@ -4,44 +4,118 @@
 @using BlazorAcademyHW.Models
 @using BlazorAcademyHW.Data
 @implements IAsyncDisposable
-@inject IDbContextFactory<BlazorAcademyHW.Data.BlazorAcademyHWContext> DbFactory
+@inject IDbContextFactory<BlazorAcademyHWContext> DbFactory
+@rendermode InteractiveServer
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Students</PageTitle>
 
-<h1>Index</h1>
+<h1>Students</h1>
 
 <p>
     <a href="students/create">Create New</a>
 </p>
 
-<QuickGrid Class="table" Items="studentsQuery" TGridItem="Students">
-    <PropertyColumn Property="s => s.LastName" />
-    <PropertyColumn Property="s => s.FirstName" />
-    <PropertyColumn Property="s => s.MiddleName" />
-    <PropertyColumn Property="s => s.BirthDate" />
-    <PropertyColumn Property="s => s.Email" />
-    <PropertyColumn Property="s => s.Phone" />
-    <PropertyColumn Property="s => s.Photo" />
-    <TemplateColumn Title="Группа" Context="student">
-        @(student.GroupNm?.GroupName ?? "—")
-    </TemplateColumn>
+<div class="row mb-3">
+    <div class="col-md-4">
+        <label class="form-label">Filter by Group:</label>
+        <select class="form-select" @bind="selectedGroupId" @bind:after="ApplyFilter">
+            <option value="">All Groups</option>
+            @if (groups != null)
+            {
+                @foreach (var group in groups)
+                {
+                    <option value="@group.GroupId">@group.GroupName</option>
+                }
+            }
+        </select>
+    </div>
+    <div class="col-md-4">
+        <label class="form-label">Filter by Direction:</label>
+        <select class="form-select" @bind="selectedDirectionId" @bind:after="ApplyFilter">
+            <option value="">All Directions</option>
+            @if (directions != null)
+            {
+                @foreach (var direction in directions)
+                {
+                    <option value="@direction.DirectionId">@direction.DirectionName</option>
+                }
+            }
+        </select>
+    </div>
+</div>
 
-    <TemplateColumn Context="student">
-        <a href="@($"students/edit?studid={student.StudId}")">Edit</a> |
-        <a href="@($"students/details?studid={student.StudId}")">Details</a> |
-        <a href="@($"students/delete?studid={student.StudId}")">Delete</a>
-    </TemplateColumn>
-</QuickGrid>
+@if (studentsQuery != null)
+{
+    <QuickGrid Class="table" Items="studentsQuery">
+        <PropertyColumn Property="s => s.LastName" Sortable="true" />
+        <PropertyColumn Property="s => s.FirstName" Sortable="true" />
+        <PropertyColumn Property="s => s.MiddleName" />
+        <PropertyColumn Property="s => s.BirthDate" Format="dd.MM.yyyy" />
+        <PropertyColumn Property="s => s.Email" />
+        <PropertyColumn Property="s => s.Phone" />
+        <TemplateColumn Title="Group">
+            @(context.GroupNm?.GroupName ?? "No group")
+        </TemplateColumn>
+        <TemplateColumn Context="student">
+            <a href="@($"students/edit?studid={student.StudId}")">Edit</a> |
+            <a href="@($"students/details?studid={student.StudId}")">Details</a> |
+            <a href="@($"students/delete?studid={student.StudId}")">Delete</a>
+        </TemplateColumn>
+    </QuickGrid>
+}
+else
+{
+    <div class="alert alert-info">
+        <em>Loading...</em>
+    </div>
+}
 
 @code {
     private BlazorAcademyHWContext context = default!;
-    private IQueryable<Students> studentsQuery = default!;
+    private IQueryable<Students>? baseQuery;
+    private IQueryable<Students>? studentsQuery;
+    private List<Groups>? groups;
+    private List<Directions>? directions;
+    
+    private int? selectedGroupId = null;
+    private byte? selectedDirectionId = null;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        context = DbFactory.CreateDbContext();
-        studentsQuery = context.Students
-            .Include(s => s.GroupNm);
+        context = await DbFactory.CreateDbContextAsync();
+        
+        // Загружаем данные для фильтров
+        groups = await context.Groups.ToListAsync();
+        directions = await context.Directions.ToListAsync();
+        
+        // Базовый запрос с включением связанных данных
+        baseQuery = context.Students
+            .Include(s => s.GroupNm)
+            .AsQueryable();
+            
+        // Применяем фильтр (пока без параметров)
+        ApplyFilter();
+    }
+
+    private void ApplyFilter()
+    {
+        if (baseQuery == null) return;
+        
+        var query = baseQuery;
+        
+        // Применяем фильтр по группе
+        if (selectedGroupId.HasValue)
+        {
+            query = query.Where(s => s.Group == selectedGroupId.Value);
+        }
+        
+        // Применяем фильтр по направлению
+        if (selectedDirectionId.HasValue)
+        {
+            query = query.Where(s => s.GroupNm != null && s.GroupNm.Direction == selectedDirectionId.Value);
+        }
+        
+        studentsQuery = query;
     }
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();

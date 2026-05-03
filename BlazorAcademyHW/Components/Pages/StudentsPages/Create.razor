@@ -1,81 +1,114 @@
 ﻿@page "/students/create"
+@rendermode InteractiveServer
 @using Microsoft.EntityFrameworkCore
 @using BlazorAcademyHW.Models
-@inject IDbContextFactory<BlazorAcademyHW.Data.BlazorAcademyHWContext> DbFactory
-@inject NavigationManager NavigationManager
+@using BlazorAcademyHW.Data
+@inject IDbContextFactory<BlazorAcademyHWContext> DbFactory
+@inject NavigationManager Navigation
 
-<PageTitle>Create</PageTitle>
+<PageTitle>Create Student</PageTitle>
 
-<h1>Create</h1>
+<h1>Create Student</h1>
 
-<h2>Students</h2>
 <hr />
 <div class="row">
-    <div class="col-md-4">
-        <EditForm Model="Students" OnValidSubmit="AddStudents" FormName="create-students" Enhance>
+    <div class="col-md-6">
+        <EditForm Model="newStudent" OnValidSubmit="HandleValidSubmit" FormName="createStudent">
             <DataAnnotationsValidator />
-            <ValidationSummary class="text-danger" role="alert" />
+            <ValidationSummary />
             
             <div class="mb-3">
-                <label for="lastname" class="form-label">LastName:</label>
-                <InputText id="lastname" @bind-Value="Students.LastName" class="form-control" />
-                <ValidationMessage For="@(() => Students.LastName)" class="text-danger" />
+                <label class="form-label">Last Name:</label>
+                <InputText class="form-control" @bind-Value="newStudent.LastName" />
+                <ValidationMessage For="() => newStudent.LastName" />
             </div>
             
             <div class="mb-3">
-                <label for="firstname" class="form-label">FirstName:</label>
-                <InputText id="firstname" @bind-Value="Students.FirstName" class="form-control" />
-                <ValidationMessage For="@(() => Students.FirstName)" class="text-danger" />
+                <label class="form-label">First Name:</label>
+                <InputText class="form-control" @bind-Value="newStudent.FirstName" />
+                <ValidationMessage For="() => newStudent.FirstName" />
             </div>
             
             <div class="mb-3">
-                <label for="middlename" class="form-label">MiddleName:</label>
-                <InputText id="middlename" @bind-Value="Students.MiddleName" class="form-control" />
-                <ValidationMessage For="@(() => Students.MiddleName)" class="text-danger" />
+                <label class="form-label">Middle Name:</label>
+                <InputText class="form-control" @bind-Value="newStudent.MiddleName" />
             </div>
             
             <div class="mb-3">
-                <label for="birthdate" class="form-label">BirthDate:</label>
-                <InputDate id="birthdate" @bind-Value="Students.BirthDate" class="form-control" />
-                <ValidationMessage For="@(() => Students.BirthDate)" class="text-danger" />
+                <label class="form-label">Birth Date:</label>
+                <InputDate class="form-control" @bind-Value="newStudent.BirthDate" />
             </div>
             
             <div class="mb-3">
-                <label for="email" class="form-label">Email:</label>
-                <InputText id="email" @bind-Value="Students.Email" class="form-control" />
-                <ValidationMessage For="@(() => Students.Email)" class="text-danger" />
+                <label class="form-label">Email:</label>
+                <InputText class="form-control" @bind-Value="newStudent.Email" type="email" />
             </div>
             
             <div class="mb-3">
-                <label for="phone" class="form-label">Phone:</label>
-                <InputText id="phone" @bind-Value="Students.Phone" class="form-control" />
-                <ValidationMessage For="@(() => Students.Phone)" class="text-danger" />
+                <label class="form-label">Phone:</label>
+                <InputText class="form-control" @bind-Value="newStudent.Phone" type="tel" />
             </div>
             
             <div class="mb-3">
-                <label for="group" class="form-label">Group:</label>
-                <InputNumber id="group" @bind-Value="Students.Group" class="form-control" />
-                <ValidationMessage For="@(() => Students.Group)" class="text-danger" />
+                <label class="form-label">Group:</label>
+                <InputSelect class="form-control" @bind-Value="newStudent.Group">
+                    <option value="">Select Group</option>
+                    @if (groups != null)
+                    {
+                        @foreach (var group in groups)
+                        {
+                            <option value="@group.GroupId">@group.GroupName</option>
+                        }
+                    }
+                </InputSelect>
             </div>
             
-            <button type="submit" class="btn btn-primary">Create</button>
+            <div class="mb-3">
+                <label class="form-label">Photo:</label>
+                <InputFile OnChange="OnInputFileChange" />
+                @if (previewUrl != null)
+                {
+                    <div class="mt-2">
+                        <img src="@previewUrl" alt="Preview" style="max-width: 200px;" />
+                    </div>
+                }
+            </div>
+            
+            <div class="mb-3">
+                <button type="submit" class="btn btn-primary">Create</button>
+                <a href="/students" class="btn btn-secondary ms-2">Cancel</a>
+            </div>
         </EditForm>
     </div>
 </div>
 
-<div>
-    <a href="/students">Back to List</a>
-</div>
-
 @code {
-    [SupplyParameterFromForm]
-    private Students Students { get; set; } = new();
+    private Students newStudent = new Students();
+    private List<Groups>? groups;
+    private string? previewUrl;
+    private byte[]? uploadedPhoto;
 
-    private async Task AddStudents()
+    protected override async Task OnInitializedAsync()
     {
-        using var context = DbFactory.CreateDbContext();
-        context.Students.Add(Students);
+        using var context = await DbFactory.CreateDbContextAsync();
+        groups = await context.Groups.ToListAsync();
+    }
+
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        var buffer = new byte[file.Size];
+        await file.OpenReadStream(5 * 1024 * 1024).ReadAsync(buffer); // 5MB limit
+        uploadedPhoto = buffer;
+        previewUrl = $"data:{file.ContentType};base64,{Convert.ToBase64String(buffer)}";
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        using var context = await DbFactory.CreateDbContextAsync();
+        newStudent.Photo = uploadedPhoto;
+        context.Students.Add(newStudent);
         await context.SaveChangesAsync();
-        NavigationManager.NavigateTo("/students");
+        Navigation.NavigateTo("/students");
     }
 }

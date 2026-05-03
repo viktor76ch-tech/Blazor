@@ -14,11 +14,14 @@ namespace BlazorAcademyHW.Models
 
         [Column("number_of_lessons")]
         public byte NumberOfLessons { get; set; }
+
         [NotMapped]
         public int NumberOfLessonsInput
         {
             get => NumberOfLessons;
             set => NumberOfLessons = (byte)Math.Clamp(value, 0, 255);
         }
+
+        public ICollection<TeachersDisciplines>? TeacherDisciplines { get; set; }
     }
 }

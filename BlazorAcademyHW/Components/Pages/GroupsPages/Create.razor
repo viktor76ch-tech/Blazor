@@ -1,51 +1,116 @@
 ﻿@page "/groups/create"
+@rendermode InteractiveServer
 @using Microsoft.EntityFrameworkCore
 @using BlazorAcademyHW.Models
-@inject IDbContextFactory<BlazorAcademyHW.Data.BlazorAcademyHWContext> DbFactory
-@inject NavigationManager NavigationManager
+@using BlazorAcademyHW.Data
+@inject IDbContextFactory<BlazorAcademyHWContext> DbFactory
+@inject NavigationManager Navigation
 
-<PageTitle>Create</PageTitle>
+<PageTitle>Create Group</PageTitle>
 
-<h1>Create</h1>
+<h1>Create Group</h1>
 
-<h2>Groups</h2>
 <hr />
 <div class="row">
-    <div class="col-md-4">
-        <EditForm Model="Groups" OnValidSubmit="AddGroups" FormName="create-groups" Enhance>
+    <div class="col-md-6">
+        <EditForm Model="newGroup" OnValidSubmit="HandleValidSubmit" FormName="create-group">
             <DataAnnotationsValidator />
-            <ValidationSummary class="text-danger" role="alert" />
+            <ValidationSummary />
             
             <div class="mb-3">
-                <label for="groupname" class="form-label">GroupName:</label>
-                <InputText id="groupname" @bind-Value="Groups.GroupName" class="form-control" />
-                <ValidationMessage For="@(() => Groups.GroupName)" class="text-danger" />
+                <label class="form-label">Group Name:</label>
+                <InputText class="form-control" @bind-Value="newGroup.GroupName" />
             </div>
             
             <div class="mb-3">
-                <label for="direction" class="form-label">Direction:</label>
-                <InputNumber id="direction" @bind-Value="Groups.DirectionInput" class="form-control" />
-                <ValidationMessage For="@(() => Groups.DirectionInput)" class="text-danger" />
+                <label class="form-label">Direction:</label>
+                <InputSelect class="form-control" @bind-Value="newGroup.Direction">
+                    <option value="">Select Direction</option>
+                    @if (directions != null)
+                    {
+                        @foreach (var dir in directions)
+                        {
+                            <option value="@dir.DirectionId">@dir.DirectionName</option>
+                        }
+                    }
+                </InputSelect>
             </div>
             
-            <button type="submit" class="btn btn-primary">Create</button>
+            <div class="mb-3">
+                <label class="form-label">Schedule Days:</label>
+                <div class="row">
+                    @foreach (var day in availableDays)
+                    {
+                        <div class="col-auto">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input"
+                                       id="day_@day.Value"
+                                       checked="@selectedDays.Contains(day.Value)"
+                                       @onchange="e => ToggleDay(day.Value, (bool)e.Value!)" />
+                                <label class="form-check-label" for="day_@day.Value">@day.Key</label>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <button type="submit" class="btn btn-primary">Create</button>
+                <a href="/groups" class="btn btn-secondary ms-2">Cancel</a>
+            </div>
         </EditForm>
     </div>
 </div>
 
-<div>
-    <a href="/groups">Back to List</a>
-</div>
-
 @code {
-    [SupplyParameterFromForm]
-    private Groups Groups { get; set; } = new() { DirectionInput = 0 };
+    private Groups newGroup = new Groups();
+    private List<Directions>? directions;
+    private HashSet<byte> selectedDays = new();
 
-    private async Task AddGroups()
+    private Dictionary<string, byte> availableDays = new()
     {
-        using var context = DbFactory.CreateDbContext();
-        context.Groups.Add(Groups);
+        {"Понедельник", 1},
+        {"Вторник", 2},
+        {"Среда", 3},
+        {"Четверг", 4},
+        {"Пятница", 5},
+        {"Суббота", 6},
+        {"Воскресенье", 0}
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = await DbFactory.CreateDbContextAsync();
+        directions = await context.Directions.ToListAsync();
+    }
+
+    private void ToggleDay(byte dayValue, bool isChecked)
+    {
+        if (isChecked)
+            selectedDays.Add(dayValue);
+        else
+            selectedDays.Remove(dayValue);
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        using var context = await DbFactory.CreateDbContextAsync();
+        
+        // Создаем группу - GroupId будет сгенерирован автоматически
+        var group = new Groups
+        {
+            GroupName = newGroup.GroupName,
+            Direction = newGroup.Direction,
+            ScheduleDays = selectedDays.Select(d => new GroupScheduleDays
+            {
+                DayOfWeek = d
+                // GroupId не указываем, EF Core сам свяжет после генерации ID группы
+            }).ToList()
+        };
+        
+        context.Groups.Add(group);
         await context.SaveChangesAsync();
-        NavigationManager.NavigateTo("/groups");
+        
+        Navigation.NavigateTo("/groups");
     }
 }

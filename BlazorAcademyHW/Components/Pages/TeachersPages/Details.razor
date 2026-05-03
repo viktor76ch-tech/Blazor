@@ -1,55 +1,55 @@
 ﻿@page "/teachers/details"
 @using Microsoft.EntityFrameworkCore
 @using BlazorAcademyHW.Models
+@using BlazorAcademyHW.Data
 @inject IDbContextFactory<BlazorAcademyHW.Data.BlazorAcademyHWContext> DbFactory
-@inject NavigationManager NavigationManager
+@implements IAsyncDisposable
 
-<PageTitle>Details</PageTitle>
-
-<h1>Details</h1>
-
-<div>
-    <h2>Teachers</h2>
-    <hr />
-    @if (teachers is null)
+<h3>Teacher Details</h3>
+@if (teacher != null)
+{
+    <dl class="row">
+        <dt class="col-sm-2">Last Name</dt>
+        <dd class="col-sm-10">@teacher.LastName</dd>
+        <dt class="col-sm-2">First Name</dt>
+        <dd class="col-sm-10">@teacher.FirstName</dd>
+        <dt class="col-sm-2">Email</dt>
+        <dd class="col-sm-10">@teacher.Email</dd>
+        <dt class="col-sm-2">Phone</dt>
+        <dd class="col-sm-10">@teacher.Phone</dd>
+    </dl>
+    <h4>Can teach disciplines</h4>
+    @if (teacher.TeacherDisciplines != null && teacher.TeacherDisciplines.Any())
     {
-        <p><em>Loading...</em></p>
+        <ul>
+            @foreach (var td in teacher.TeacherDisciplines)
+            {
+                <li>@td.Discipline?.DisciplineName</li>
+            }
+        </ul>
     }
-    else {
-        <dl class="row">
-            <dt class="col-sm-2">LastName</dt>            <dd class="col-sm-10">@teachers.LastName</dd>
-            <dt class="col-sm-2">FirstName</dt>           <dd class="col-sm-10">@teachers.FirstName</dd>
-            <dt class="col-sm-2">MiddleName</dt>          <dd class="col-sm-10">@teachers.MiddleName</dd>
-            <dt class="col-sm-2">BirthDate</dt>           <dd class="col-sm-10">@teachers.BirthDate</dd>
-            <dt class="col-sm-2">Email</dt>               <dd class="col-sm-10">@teachers.Email</dd>
-            <dt class="col-sm-2">Phone</dt>              <dd class="col-sm-10">@teachers.Phone</dd>
-            @* <dt class="col-sm-2">Photo</dt>            <dd class="col-sm-10">@teachers.Photo</dd> *@
-            <dt class="col-sm-2">WorkSince</dt>
-            <dd class="col-sm-10">@teachers.WorkSince</dd>
-            <dt class="col-sm-2">Rate</dt>
-            <dd class="col-sm-10">@teachers.Rate</dd>
-        </dl>
-        <div>
-            <a href="@($"/teachers/edit?teacherid={teachers.TeacherId}")">Edit</a> |
-            <a href="@($"/teachers")">Back to List</a>
-        </div>
+    else
+    {
+        <p>No disciplines assigned.</p>
     }
-</div>
+}
+<a href="/teachers">Back to List</a>
 
 @code {
-    private Teachers? teachers;
-
-    [SupplyParameterFromQuery]
-    private int TeacherId { get; set; }
+    [Parameter]
+    public short TeacherId { get; set; }
+    
+    private Teachers? teacher;
+    private BlazorAcademyHW.Data.BlazorAcademyHWContext context = default!;
 
     protected override async Task OnInitializedAsync()
     {
-        using var context = DbFactory.CreateDbContext();
-        teachers = await context.Teachers.FirstOrDefaultAsync(m => m.TeacherId == TeacherId);
-
-        if (teachers is null)
-        {
-            NavigationManager.NavigateTo("notfound");
-        }
+        context = await DbFactory.CreateDbContextAsync();
+        teacher = await context.Teachers
+            .Include(t => t.TeacherDisciplines!)
+            .ThenInclude(td => td.Discipline)
+            .FirstOrDefaultAsync(t => t.TeacherId == TeacherId);
     }
+    
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
 }

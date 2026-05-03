@@ -1,14 +1,15 @@
 ﻿@page "/students/edit"
+@rendermode InteractiveServer
 @using Microsoft.EntityFrameworkCore
 @using BlazorAcademyHW.Models
-@inject IDbContextFactory<BlazorAcademyHW.Data.BlazorAcademyHWContext> DbFactory
+@using BlazorAcademyHW.Data
+@inject IDbContextFactory<BlazorAcademyHWContext> DbFactory
 @inject NavigationManager NavigationManager
 
-<PageTitle>Edit</PageTitle>
+<PageTitle>Edit Student</PageTitle>
 
-<h1>Edit</h1>
+<h1>Edit Student</h1>
 
-<h2>Students</h2>
 <hr />
 
 @if (Students is null)
@@ -18,54 +19,89 @@
 else
 {
     <div class="row">
-        <div class="col-md-4">
-            <EditForm Model="Students" OnValidSubmit="UpdateStudents" FormName="edit-students" Enhance>
+        <div class="col-md-6">
+            <EditForm Model="Students" OnValidSubmit="UpdateStudents" FormName="edit-student">
                 <DataAnnotationsValidator />
                 <ValidationSummary class="text-danger" role="alert" />
                 
                 <div class="mb-3">
-                    <label for="lastname" class="form-label">LastName:</label>
+                    <label for="lastname" class="form-label">Last Name:</label>
                     <InputText id="lastname" @bind-Value="Students.LastName" class="form-control" />
                     <ValidationMessage For="@(() => Students.LastName)" class="text-danger" />
                 </div>
                 
                 <div class="mb-3">
-                    <label for="firstname" class="form-label">FirstName:</label>
+                    <label for="firstname" class="form-label">First Name:</label>
                     <InputText id="firstname" @bind-Value="Students.FirstName" class="form-control" />
                     <ValidationMessage For="@(() => Students.FirstName)" class="text-danger" />
                 </div>
                 
                 <div class="mb-3">
-                    <label for="middlename" class="form-label">MiddleName:</label>
+                    <label for="middlename" class="form-label">Middle Name:</label>
                     <InputText id="middlename" @bind-Value="Students.MiddleName" class="form-control" />
                     <ValidationMessage For="@(() => Students.MiddleName)" class="text-danger" />
                 </div>
                 
                 <div class="mb-3">
-                    <label for="birthdate" class="form-label">BirthDate:</label>
+                    <label for="birthdate" class="form-label">Birth Date:</label>
                     <InputDate id="birthdate" @bind-Value="Students.BirthDate" class="form-control" />
                     <ValidationMessage For="@(() => Students.BirthDate)" class="text-danger" />
                 </div>
                 
                 <div class="mb-3">
                     <label for="email" class="form-label">Email:</label>
-                    <InputText id="email" @bind-Value="Students.Email" class="form-control" />
+                    <InputText id="email" @bind-Value="Students.Email" class="form-control" type="email" />
                     <ValidationMessage For="@(() => Students.Email)" class="text-danger" />
                 </div>
                 
                 <div class="mb-3">
                     <label for="phone" class="form-label">Phone:</label>
-                    <InputText id="phone" @bind-Value="Students.Phone" class="form-control" />
+                    <InputText id="phone" @bind-Value="Students.Phone" class="form-control" type="tel" />
                     <ValidationMessage For="@(() => Students.Phone)" class="text-danger" />
                 </div>
                 
                 <div class="mb-3">
                     <label for="group" class="form-label">Group:</label>
-                    <InputNumber id="group" @bind-Value="Students.Group" class="form-control" />
+                    <InputSelect id="group" @bind-Value="Students.Group" class="form-control">
+                        <option value="">-- Select Group --</option>
+                        @if (groupsList != null)
+                        {
+                            @foreach (var group in groupsList)
+                            {
+                                <option value="@group.GroupId">@group.GroupName</option>
+                            }
+                        }
+                    </InputSelect>
                     <ValidationMessage For="@(() => Students.Group)" class="text-danger" />
                 </div>
                 
-                <button type="submit" class="btn btn-primary">Save</button>
+                <div class="mb-3">
+                    <label class="form-label">Photo:</label>
+                    @if (Students.Photo != null && Students.Photo.Length > 0)
+                    {
+                        <div class="mb-2">
+                            <img src="data:image/png;base64,@Convert.ToBase64String(Students.Photo)"
+                                 alt="Current photo" style="max-width: 200px;" />
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="removePhoto" @bind="removePhoto" />
+                            <label class="form-check-label" for="removePhoto">Remove current photo</label>
+                        </div>
+                    }
+                    <InputFile OnChange="OnInputFileChange" />
+                    @if (previewUrl != null)
+                    {
+                        <div class="mt-2">
+                            <p>New photo preview:</p>
+                            <img src="@previewUrl" alt="Preview" style="max-width: 200px;" />
+                        </div>
+                    }
+                </div>
+                
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <a href="/students" class="btn btn-secondary ms-2">Cancel</a>
+                </div>
             </EditForm>
         </div>
     </div>
@@ -79,13 +115,22 @@ else
     [SupplyParameterFromQuery]
     private int StudId { get; set; }
 
-    [SupplyParameterFromForm]
     private Students? Students { get; set; }
+    private List<Groups>? groupsList;
+    private string? previewUrl;
+    private byte[]? newPhoto;
+    private bool removePhoto = false;
 
     protected override async Task OnInitializedAsync()
     {
-        using var context = DbFactory.CreateDbContext();
-        Students ??= await context.Students.FirstOrDefaultAsync(m => m.StudId == StudId);
+        using var context = await DbFactory.CreateDbContextAsync();
+        
+        // Загружаем студента
+        Students = await context.Students
+            .FirstOrDefaultAsync(m => m.StudId == StudId);
+
+        // Загружаем список групп для выпадающего списка
+        groupsList = await context.Groups.ToListAsync();
 
         if (Students is null)
         {
@@ -93,10 +138,46 @@ else
         }
     }
 
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        var buffer = new byte[file.Size];
+        await file.OpenReadStream(5 * 1024 * 1024).ReadAsync(buffer);
+        newPhoto = buffer;
+        previewUrl = $"data:{file.ContentType};base64,{Convert.ToBase64String(buffer)}";
+    }
+
     private async Task UpdateStudents()
     {
-        using var context = DbFactory.CreateDbContext();
-        context.Students.Update(Students!);
+        using var context = await DbFactory.CreateDbContextAsync();
+        
+        // Получаем существующего студента из БД
+        var studentToUpdate = await context.Students.FindAsync(StudId);
+        
+        if (studentToUpdate == null)
+        {
+            NavigationManager.NavigateTo("notfound");
+            return;
+        }
+
+        // Обновляем поля
+        studentToUpdate.LastName = Students!.LastName;
+        studentToUpdate.FirstName = Students.FirstName;
+        studentToUpdate.MiddleName = Students.MiddleName;
+        studentToUpdate.BirthDate = Students.BirthDate;
+        studentToUpdate.Email = Students.Email;
+        studentToUpdate.Phone = Students.Phone;
+        studentToUpdate.Group = Students.Group;
+
+        // Обработка фото
+        if (removePhoto)
+        {
+            studentToUpdate.Photo = null;
+        }
+        else if (newPhoto != null)
+        {
+            studentToUpdate.Photo = newPhoto;
+        }
         
         try
         {
@@ -105,7 +186,7 @@ else
         }
         catch (DbUpdateConcurrencyException)
         {
-            if (!await StudentsExists(Students!.StudId))
+            if (!await StudentsExists(StudId))
             {
                 NavigationManager.NavigateTo("notfound");
             }
@@ -118,7 +199,7 @@ else
 
     private async Task<bool> StudentsExists(int studid)
     {
-        using var context = DbFactory.CreateDbContext();
+        using var context = await DbFactory.CreateDbContextAsync();
         return await context.Students.AnyAsync(e => e.StudId == studid);
     }
 }

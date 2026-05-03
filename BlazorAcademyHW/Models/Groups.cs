@@ -7,6 +7,7 @@ namespace BlazorAcademyHW.Models
     {
         [Key]
         [Column("group_id")]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int GroupId { get; set; }
 
         [Column("group_name")]
@@ -18,11 +19,13 @@ namespace BlazorAcademyHW.Models
         [NotMapped]
         public int DirectionInput
         {
-            get => (int)Direction;
+            get => Direction ?? 0;
             set => Direction = (byte)Math.Clamp(value, 0, 255);
         }
 
         [ForeignKey(nameof(Direction))]
         public Directions? DirectionNavigation { get; set; }
+
+        public ICollection<GroupScheduleDays>? ScheduleDays { get; set; }
     }
 }

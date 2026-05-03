@@ -1,40 +1,117 @@
 ﻿@page "/groups"
+@rendermode InteractiveServer
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using BlazorAcademyHW.Models
 @using BlazorAcademyHW.Data
 @implements IAsyncDisposable
-@inject IDbContextFactory<BlazorAcademyHW.Data.BlazorAcademyHWContext> DbFactory
+@inject IDbContextFactory<BlazorAcademyHWContext> DbFactory
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Groups</PageTitle>
 
-<h1>Index</h1>
+<h1>Groups</h1>
 
 <p>
     <a href="groups/create">Create New</a>
 </p>
 
-<QuickGrid Class="table" Items="groupsQuery" TGridItem="Groups">
-    <PropertyColumn Property="g => g.GroupName" />
-    <TemplateColumn Title="Направление" Context="group">
-        @(group.DirectionNavigation?.DirectionName ?? "—")
-    </TemplateColumn>
-    <TemplateColumn Context="g">
-        <a href="@($"groups/edit?groupid={g.GroupId}")">Edit</a> |
-        <a href="@($"groups/details?groupid={g.GroupId}")">Details</a> |
-        <a href="@($"groups/delete?groupid={g.GroupId}")">Delete</a>
-    </TemplateColumn>
-</QuickGrid>
+@if (groupsQuery != null)
+{
+    <QuickGrid Class="table" Items="groupsQuery">
+        <PropertyColumn Property="g => g.GroupName" Sortable="true" />
+        
+        <TemplateColumn Title="Direction" Sortable="false">
+            <HeaderTemplate>
+                <div class="d-flex align-items-center">
+                    <span class="me-1 fw-bold">Direction</span>
+                    <select class="form-select form-select-sm border-0 bg-transparent"
+                            @bind="selectedDirectionId"
+                            @bind:after="ApplyFilter"
+                            style="width: 20px; cursor: pointer; appearance: auto; padding: 0; background: none;">
+                        <option value="">▼</option>
+                        <option value="">All Directions</option>
+                        @if (directions != null)
+                        {
+                            @foreach (var direction in directions)
+                            {
+                                <option value="@direction.DirectionId">@direction.DirectionName</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </HeaderTemplate>
+            <ChildContent>
+                @(context.DirectionNavigation?.DirectionName ?? "No direction")
+            </ChildContent>
+        </TemplateColumn>
+        
+        <TemplateColumn Title="Schedule" Sortable="false">
+            @GetScheduleString(context)
+        </TemplateColumn>
+        
+        <TemplateColumn Context="group">
+            <a href="@($"groups/edit?groupid={group.GroupId}")">Edit</a> |
+            <a href="@($"groups/details?groupid={group.GroupId}")">Details</a> |
+            <a href="@($"groups/delete?groupid={group.GroupId}")">Delete</a>
+        </TemplateColumn>
+    </QuickGrid>
+}
+else
+{
+    <div class="alert alert-info">
+        <em>Loading...</em>
+    </div>
+}
 
 @code {
     private BlazorAcademyHWContext context = default!;
-    private IQueryable<Groups> groupsQuery = default!;
+    private IQueryable<Groups>? groupsQuery;
+    private List<Directions>? directions;
+    
+    private byte? selectedDirectionId = null;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        context = DbFactory.CreateDbContext();
-        groupsQuery = context.Groups
-            .Include(g => g.DirectionNavigation);
+        context = await DbFactory.CreateDbContextAsync();
+        directions = await context.Directions.ToListAsync();
+        
+        ApplyFilter();
+    }
+
+    private void ApplyFilter()
+    {
+        var query = context.Groups
+            .Include(g => g.DirectionNavigation)
+            .Include(g => g.ScheduleDays)
+            .AsQueryable();
+        
+        if (selectedDirectionId.HasValue)
+        {
+            query = query.Where(g => g.Direction == selectedDirectionId.Value);
+        }
+        
+        groupsQuery = query;
+    }
+
+    private string GetScheduleString(Groups group)
+    {
+        if (group.ScheduleDays == null || !group.ScheduleDays.Any()) return "—";
+        
+        var dayNames = group.ScheduleDays
+            .OrderBy(d => d.DayOfWeek)
+            .Select(d => d.DayOfWeek switch
+            {
+                0 => "Вс",
+                1 => "Пн",
+                2 => "Вт",
+                3 => "Ср",
+                4 => "Чт",
+                5 => "Пт",
+                6 => "Сб",
+                _ => "???"
+            });
+        
+        return string.Join(", ", dayNames);
     }
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();

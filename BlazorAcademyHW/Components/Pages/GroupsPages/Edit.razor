@@ -1,94 +1,142 @@
 ﻿@page "/groups/edit"
+@rendermode InteractiveServer
 @using Microsoft.EntityFrameworkCore
 @using BlazorAcademyHW.Models
-@inject IDbContextFactory<BlazorAcademyHW.Data.BlazorAcademyHWContext> DbFactory
-@inject NavigationManager NavigationManager
+@using BlazorAcademyHW.Data
+@inject IDbContextFactory<BlazorAcademyHWContext> DbFactory
+@inject NavigationManager Navigation
 
-<PageTitle>Edit</PageTitle>
+<PageTitle>Edit Group</PageTitle>
 
-<h1>Edit</h1>
+<h1>Edit Group</h1>
 
-<h2>Groups</h2>
 <hr />
 
-@if (Groups is null)
+@if (editGroup == null)
 {
     <p><em>Loading...</em></p>
 }
 else
 {
     <div class="row">
-        <div class="col-md-4">
-            <EditForm Model="Groups" OnValidSubmit="UpdateGroups" FormName="edit-groups" Enhance>
+        <div class="col-md-6">
+            <EditForm Model="editGroup" OnValidSubmit="HandleValidSubmit" FormName="edit-group">
                 <DataAnnotationsValidator />
-                <ValidationSummary class="text-danger" role="alert" />
+                <ValidationSummary />
                 
                 <div class="mb-3">
-                    <label for="groupname" class="form-label">GroupName:</label>
-                    <InputText id="groupname" @bind-Value="Groups.GroupName" class="form-control" />
-                    <ValidationMessage For="@(() => Groups.GroupName)" class="text-danger" />
+                    <label class="form-label">Group Name:</label>
+                    <InputText class="form-control" @bind-Value="editGroup.GroupName" />
                 </div>
                 
                 <div class="mb-3">
-                    <label for="direction" class="form-label">Direction:</label>
-                    <InputNumber id="direction" @bind-Value="Groups.DirectionInput" class="form-control" />
-                    <ValidationMessage For="@(() => Groups.DirectionInput)" class="text-danger" />
+                    <label class="form-label">Direction:</label>
+                    <InputSelect class="form-control" @bind-Value="editGroup.Direction">
+                        <option value="">Select Direction</option>
+                        @if (directions != null)
+                        {
+                            @foreach (var dir in directions)
+                            {
+                                <option value="@dir.DirectionId">@dir.DirectionName</option>
+                            }
+                        }
+                    </InputSelect>
                 </div>
                 
-                <button type="submit" class="btn btn-primary">Save</button>
+                <div class="mb-3">
+                    <label class="form-label">Schedule Days:</label>
+                    <div class="row">
+                        @foreach (var day in availableDays)
+                        {
+                            <div class="col-auto">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input"
+                                           id="edit_day_@day.Value"
+                                           checked="@selectedDays.Contains(day.Value)"
+                                           @onchange="e => ToggleDay(day.Value, (bool)e.Value!)" />
+                                    <label class="form-check-label" for="edit_day_@day.Value">@day.Key</label>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <a href="/groups" class="btn btn-secondary ms-2">Cancel</a>
+                </div>
             </EditForm>
         </div>
     </div>
 }
 
-<div>
-    <a href="/groups">Back to List</a>
-</div>
-
 @code {
     [SupplyParameterFromQuery]
-    private int GroupId { get; set; }
+    public int GroupId { get; set; }
+    
+    private Groups? editGroup;
+    private List<Directions>? directions;
+    private HashSet<byte> selectedDays = new();
 
-    [SupplyParameterFromForm]
-    private Groups? Groups { get; set; }
+    private Dictionary<string, byte> availableDays = new()
+    {
+        {"Понедельник", 1},
+        {"Вторник", 2},
+        {"Среда", 3},
+        {"Четверг", 4},
+        {"Пятница", 5},
+        {"Суббота", 6},
+        {"Воскресенье", 0}
+    };
 
     protected override async Task OnInitializedAsync()
     {
-        using var context = DbFactory.CreateDbContext();
-        Groups ??= await context.Groups.FirstOrDefaultAsync(m => m.GroupId == GroupId);
-
-        if (Groups is null)
-        {
-            NavigationManager.NavigateTo("notfound");
-        }
-    }
-
-    private async Task UpdateGroups()
-    {
-        using var context = DbFactory.CreateDbContext();
-        context.Groups.Update(Groups!);
+        using var context = await DbFactory.CreateDbContextAsync();
+        directions = await context.Directions.ToListAsync();
         
-        try
+        editGroup = await context.Groups
+            .Include(g => g.ScheduleDays)
+            .FirstOrDefaultAsync(g => g.GroupId == GroupId);
+            
+        if (editGroup?.ScheduleDays != null)
         {
-            await context.SaveChangesAsync();
-            NavigationManager.NavigateTo("/groups");
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!await GroupsExists(Groups!.GroupId))
-            {
-                NavigationManager.NavigateTo("notfound");
-            }
-            else
-            {
-                throw;
-            }
+            selectedDays = new HashSet<byte>(editGroup.ScheduleDays.Select(s => s.DayOfWeek));
         }
     }
 
-    private async Task<bool> GroupsExists(int groupid)
+    private void ToggleDay(byte dayValue, bool isChecked)
     {
-        using var context = DbFactory.CreateDbContext();
-        return await context.Groups.AnyAsync(e => e.GroupId == groupid);
+        if (isChecked)
+            selectedDays.Add(dayValue);
+        else
+            selectedDays.Remove(dayValue);
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        using var context = await DbFactory.CreateDbContextAsync();
+        
+        var groupInDb = await context.Groups
+            .Include(g => g.ScheduleDays)
+            .FirstAsync(g => g.GroupId == GroupId);
+            
+        groupInDb.GroupName = editGroup!.GroupName;
+        groupInDb.Direction = editGroup.Direction;
+        
+        // Удаляем старые дни расписания
+        if (groupInDb.ScheduleDays != null && groupInDb.ScheduleDays.Any())
+        {
+            context.GroupScheduleDays.RemoveRange(groupInDb.ScheduleDays);
+        }
+        
+        // Добавляем новые дни расписания
+        groupInDb.ScheduleDays = selectedDays.Select(d => new GroupScheduleDays
+        {
+            GroupId = GroupId,
+            DayOfWeek = d
+        }).ToList();
+        
+        await context.SaveChangesAsync();
+        Navigation.NavigateTo("/groups");
     }
 }
