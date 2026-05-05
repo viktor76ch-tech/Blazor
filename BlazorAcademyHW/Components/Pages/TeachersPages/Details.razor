@@ -1,9 +1,9 @@
 ﻿@page "/teachers/details"
+@rendermode InteractiveServer
 @using Microsoft.EntityFrameworkCore
 @using BlazorAcademyHW.Models
 @using BlazorAcademyHW.Data
-@inject IDbContextFactory<BlazorAcademyHW.Data.BlazorAcademyHWContext> DbFactory
-@implements IAsyncDisposable
+@inject IDbContextFactory<BlazorAcademyHWContext> DbFactory
 
 <h3>Teacher Details</h3>
 @if (teacher != null)
@@ -13,43 +13,34 @@
         <dd class="col-sm-10">@teacher.LastName</dd>
         <dt class="col-sm-2">First Name</dt>
         <dd class="col-sm-10">@teacher.FirstName</dd>
+        <dt class="col-sm-2">Middle Name</dt>
+        <dd class="col-sm-10">@teacher.MiddleName</dd>
+        <dt class="col-sm-2">Birth Date</dt>
+        <dd class="col-sm-10">@teacher.BirthDate</dd>
         <dt class="col-sm-2">Email</dt>
         <dd class="col-sm-10">@teacher.Email</dd>
         <dt class="col-sm-2">Phone</dt>
         <dd class="col-sm-10">@teacher.Phone</dd>
+        <dt class="col-sm-2">Work Since</dt>
+        <dd class="col-sm-10">@teacher.WorkSince</dd>
+        <dt class="col-sm-2">Rate</dt>
+        <dd class="col-sm-10">@teacher.Rate</dd>
     </dl>
-    <h4>Can teach disciplines</h4>
-    @if (teacher.TeacherDisciplines != null && teacher.TeacherDisciplines.Any())
-    {
-        <ul>
-            @foreach (var td in teacher.TeacherDisciplines)
-            {
-                <li>@td.Discipline?.DisciplineName</li>
-            }
-        </ul>
-    }
-    else
-    {
-        <p>No disciplines assigned.</p>
-    }
 }
 <a href="/teachers">Back to List</a>
 
 @code {
     [Parameter]
-    public short TeacherId { get; set; }
+    [SupplyParameterFromQuery(Name = "teacherid")]
+    public int TeacherId { get; set; }
     
     private Teachers? teacher;
-    private BlazorAcademyHW.Data.BlazorAcademyHWContext context = default!;
 
     protected override async Task OnInitializedAsync()
     {
-        context = await DbFactory.CreateDbContextAsync();
+        using var context = await DbFactory.CreateDbContextAsync();
         teacher = await context.Teachers
-            .Include(t => t.TeacherDisciplines!)
-            .ThenInclude(td => td.Discipline)
-            .FirstOrDefaultAsync(t => t.TeacherId == TeacherId);
+            .AsNoTracking()
+            .FirstOrDefaultAsync(t => t.TeacherId == (short)TeacherId);
     }
-    
-    public async ValueTask DisposeAsync() => await context.DisposeAsync();
 }

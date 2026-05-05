@@ -1,94 +1,73 @@
 ﻿@page "/disciplines/edit"
+@rendermode InteractiveServer
 @using Microsoft.EntityFrameworkCore
 @using BlazorAcademyHW.Models
-@inject IDbContextFactory<BlazorAcademyHW.Data.BlazorAcademyHWContext> DbFactory
-@inject NavigationManager NavigationManager
+@using BlazorAcademyHW.Data
+@inject IDbContextFactory<BlazorAcademyHWContext> DbFactory
+@inject NavigationManager Navigation
 
-<PageTitle>Edit</PageTitle>
+<PageTitle>Edit Discipline</PageTitle>
 
-<h1>Edit</h1>
+<h1>Edit Discipline</h1>
 
-<h2>Disciplines</h2>
 <hr />
 
-@if (Disciplines is null)
+@if (editDiscipline == null)
 {
     <p><em>Loading...</em></p>
 }
 else
 {
     <div class="row">
-        <div class="col-md-4">
-            <EditForm Model="Disciplines" OnValidSubmit="UpdateDisciplines" FormName="edit-disciplines" Enhance>
+        <div class="col-md-6">
+            <EditForm Model="editDiscipline" OnValidSubmit="HandleValidSubmit" FormName="edit-discipline">
                 <DataAnnotationsValidator />
-                <ValidationSummary class="text-danger" role="alert" />
+                <ValidationSummary />
                 
                 <div class="mb-3">
-                    <label for="disciplinename" class="form-label">DisciplineName:</label>
-                    <InputText id="disciplinename" @bind-Value="Disciplines.DisciplineName" class="form-control" />
-                    <ValidationMessage For="@(() => Disciplines.DisciplineName)" class="text-danger" />
+                    <label class="form-label">Discipline Name:</label>
+                    <InputText class="form-control" @bind-Value="editDiscipline.DisciplineName" />
                 </div>
                 
                 <div class="mb-3">
-                    <label for="numberoflessons" class="form-label">NumberOfLessons:</label>
-                    <InputNumber id="numberoflessons" @bind-Value="Disciplines.NumberOfLessonsInput" class="form-control" />
-                    <ValidationMessage For="@(() => Disciplines.NumberOfLessonsInput)" class="text-danger" />
+                    <label class="form-label">Number of Lessons:</label>
+                    <InputNumber class="form-control" @bind-Value="editDiscipline.NumberOfLessonsInput" />
                 </div>
                 
-                <button type="submit" class="btn btn-primary">Save</button>
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <a href="/disciplines" class="btn btn-secondary ms-2">Cancel</a>
+                </div>
             </EditForm>
         </div>
     </div>
 }
 
-<div>
-    <a href="/disciplines">Back to List</a>
-</div>
-
 @code {
     [SupplyParameterFromQuery]
-    private int DisciplineId { get; set; }
-
-    [SupplyParameterFromForm]
-    private Disciplines? Disciplines { get; set; }
+    public int DisciplineId { get; set; }
+    
+    private Disciplines? editDiscipline;
 
     protected override async Task OnInitializedAsync()
     {
-        using var context = DbFactory.CreateDbContext();
-        Disciplines ??= await context.Disciplines.FirstOrDefaultAsync(m => m.DisciplineId == DisciplineId);
-
-        if (Disciplines is null)
-        {
-            NavigationManager.NavigateTo("notfound");
-        }
-    }
-
-    private async Task UpdateDisciplines()
-    {
-        using var context = DbFactory.CreateDbContext();
-        context.Disciplines.Update(Disciplines!);
+        using var context = await DbFactory.CreateDbContextAsync();
         
-        try
-        {
-            await context.SaveChangesAsync();
-            NavigationManager.NavigateTo("/disciplines");
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!await DisciplinesExists(Disciplines!.DisciplineId))
-            {
-                NavigationManager.NavigateTo("notfound");
-            }
-            else
-            {
-                throw;
-            }
-        }
+        editDiscipline = await context.Disciplines
+            .FirstOrDefaultAsync(d => d.DisciplineId == (short)DisciplineId);
     }
 
-    private async Task<bool> DisciplinesExists(short disciplineid)
+    private async Task HandleValidSubmit()
     {
-        using var context = DbFactory.CreateDbContext();
-        return await context.Disciplines.AnyAsync(e => e.DisciplineId == disciplineid);
+        using var context = await DbFactory.CreateDbContextAsync();
+        
+        var disciplineInDb = await context.Disciplines
+            .FirstAsync(d => d.DisciplineId == (short)DisciplineId);
+            
+        disciplineInDb.DisciplineName = editDiscipline!.DisciplineName;
+        disciplineInDb.NumberOfLessons = (byte)Math.Clamp(editDiscipline.NumberOfLessonsInput, 0, 255);
+        
+        await context.SaveChangesAsync();
+        Navigation.NavigateTo("/disciplines");
     }
 }

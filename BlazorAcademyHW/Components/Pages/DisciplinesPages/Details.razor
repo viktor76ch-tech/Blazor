@@ -1,9 +1,9 @@
 ﻿@page "/disciplines/details"
+@rendermode InteractiveServer
 @using Microsoft.EntityFrameworkCore
 @using BlazorAcademyHW.Models
 @using BlazorAcademyHW.Data
-@inject IDbContextFactory<BlazorAcademyHW.Data.BlazorAcademyHWContext> DbFactory
-@implements IAsyncDisposable
+@inject IDbContextFactory<BlazorAcademyHWContext> DbFactory
 
 <h3>Discipline Details</h3>
 @if (discipline != null)
@@ -32,20 +32,17 @@
 <a href="/disciplines">Back to List</a>
 
 @code {
-    [Parameter]
-    public short DisciplineId { get; set; }
+    [SupplyParameterFromQuery]
+    public int DisciplineId { get; set; }
     
     private Disciplines? discipline;
-    private BlazorAcademyHW.Data.BlazorAcademyHWContext context = default!;
 
     protected override async Task OnInitializedAsync()
     {
-        context = await DbFactory.CreateDbContextAsync();
+        using var context = await DbFactory.CreateDbContextAsync();
         discipline = await context.Disciplines
             .Include(d => d.TeacherDisciplines!)
             .ThenInclude(td => td.Teacher)
-            .FirstOrDefaultAsync(d => d.DisciplineId == DisciplineId);
+            .FirstOrDefaultAsync(d => d.DisciplineId == (short)DisciplineId);
     }
-    
-    public async ValueTask DisposeAsync() => await context.DisposeAsync();
 }
