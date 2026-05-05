@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace BlazorAcademyHW.Models
 {
@@ -10,9 +11,11 @@ namespace BlazorAcademyHW.Models
         [Column("discipline_id")]
         public short DisciplineId { get; set; }
 
+        [JsonIgnore]
         [ForeignKey("TeacherId")]
         public Teachers? Teacher { get; set; }
 
+        [JsonIgnore]
         [ForeignKey("DisciplineId")]
         public Disciplines? Discipline { get; set; }
     }

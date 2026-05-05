@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace BlazorAcademyHW.Models
 {
@@ -36,6 +37,8 @@ namespace BlazorAcademyHW.Models
 
         [Column("rate")]
         public decimal? Rate { get; set; }
+
+        [JsonIgnore]
         public ICollection<TeachersDisciplines>? TeacherDisciplines { get; set; }
     }
 }

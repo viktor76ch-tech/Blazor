@@ -26,8 +26,23 @@
         <dt class="col-sm-2">Rate</dt>
         <dd class="col-sm-10">@teacher.Rate</dd>
     </dl>
+    
+    <h4 class="mt-4">Disciplines this teacher can teach:</h4>
+    @if (teacher.TeacherDisciplines != null && teacher.TeacherDisciplines.Any())
+    {
+        <ul>
+            @foreach (var td in teacher.TeacherDisciplines)
+            {
+                <li>@td.Discipline?.DisciplineName</li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p>No disciplines assigned.</p>
+    }
 }
-<a href="/teachers">Back to List</a>
+<a href="/teachers" class="btn btn-secondary mt-3">Back to List</a>
 
 @code {
     [Parameter]
@@ -41,6 +56,8 @@
         using var context = await DbFactory.CreateDbContextAsync();
         teacher = await context.Teachers
             .AsNoTracking()
+            .Include(t => t.TeacherDisciplines!)
+            .ThenInclude(td => td.Discipline)
             .FirstOrDefaultAsync(t => t.TeacherId == (short)TeacherId);
     }
 }

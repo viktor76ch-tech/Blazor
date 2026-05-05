@@ -14,7 +14,8 @@
         <dt class="col-sm-2">Number of Lessons</dt>
         <dd class="col-sm-10">@discipline.NumberOfLessons</dd>
     </dl>
-    <h4>Teachers who can teach</h4>
+    
+    <h4 class="mt-4">Teachers who can teach this discipline:</h4>
     @if (discipline.TeacherDisciplines != null && discipline.TeacherDisciplines.Any())
     {
         <ul>
@@ -29,10 +30,11 @@
         <p>No teachers assigned.</p>
     }
 }
-<a href="/disciplines">Back to List</a>
+<a href="/disciplines" class="btn btn-secondary mt-3">Back to List</a>
 
 @code {
-    [SupplyParameterFromQuery]
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "disciplineid")]
     public int DisciplineId { get; set; }
     
     private Disciplines? discipline;
@@ -41,6 +43,7 @@
     {
         using var context = await DbFactory.CreateDbContextAsync();
         discipline = await context.Disciplines
+            .AsNoTracking()
             .Include(d => d.TeacherDisciplines!)
             .ThenInclude(td => td.Teacher)
             .FirstOrDefaultAsync(d => d.DisciplineId == (short)DisciplineId);

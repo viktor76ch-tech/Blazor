@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace BlazorAcademyHW.Models
 {
@@ -22,6 +23,7 @@ namespace BlazorAcademyHW.Models
             set => NumberOfLessons = (byte)Math.Clamp(value, 0, 255);
         }
 
+        [JsonIgnore]
         public ICollection<TeachersDisciplines>? TeacherDisciplines { get; set; }
     }
 }
