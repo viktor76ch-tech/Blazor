@@ -67,6 +67,39 @@ else
                 <InputNumber class="form-control" @bind-Value="rate" />
             </div>
             
+            <!-- ДОБАВЛЕНО: текущее фото -->
+            <div class="mb-3">
+                <label class="form-label">Current Photo:</label>
+                @if (currentPhoto != null)
+                {
+                    <div class="mb-2">
+                        <img src="data:image/png;base64,@Convert.ToBase64String(currentPhoto)"
+                             alt="Current photo" style="max-width: 200px;" />
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="removePhoto" @bind="removePhoto" />
+                        <label class="form-check-label" for="removePhoto">Remove current photo</label>
+                    </div>
+                }
+                else
+                {
+                    <p>No photo</p>
+                }
+            </div>
+            
+            <!-- ДОБАВЛЕНО: новое фото -->
+            <div class="mb-3">
+                <label class="form-label">New Photo:</label>
+                <InputFile OnChange="OnInputFileChange" accept="image/*" />
+                @if (previewUrl != null)
+                {
+                    <div class="mt-2">
+                        <p>New photo preview:</p>
+                        <img src="@previewUrl" alt="Preview" style="max-width: 200px;" />
+                    </div>
+                }
+            </div>
+            
             <div class="mb-3">
                 <button class="btn btn-primary" @onclick="UpdateTeacher">Save</button>
                 <a href="/teachers" class="btn btn-secondary ms-2">Cancel</a>
@@ -91,6 +124,10 @@ else
     private string? phone;
     private DateOnly? workSince;
     private decimal? rate;
+    private byte[]? currentPhoto;
+    private byte[]? newPhoto;
+    private string? previewUrl;
+    private bool removePhoto = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -110,9 +147,19 @@ else
             phone = teacher.Phone;
             workSince = teacher.WorkSince;
             rate = teacher.Rate;
+            currentPhoto = teacher.Photo;
         }
         
         isLoading = false;
+    }
+
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        var buffer = new byte[file.Size];
+        await file.OpenReadStream(5 * 1024 * 1024).ReadAsync(buffer);
+        newPhoto = buffer;
+        previewUrl = $"data:{file.ContentType};base64,{Convert.ToBase64String(buffer)}";
     }
 
     private async Task UpdateTeacher()
@@ -131,6 +178,16 @@ else
             teacherInDb.Phone = phone;
             teacherInDb.WorkSince = workSince;
             teacherInDb.Rate = rate;
+            
+            // ДОБАВЛЕНО: обработка фото
+            if (removePhoto)
+            {
+                teacherInDb.Photo = null;
+            }
+            else if (newPhoto != null)
+            {
+                teacherInDb.Photo = newPhoto;
+            }
             
             await context.SaveChangesAsync();
         }
