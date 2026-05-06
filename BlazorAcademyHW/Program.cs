@@ -1,4 +1,5 @@
 ﻿using BlazorAcademyHW.Components;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using BlazorAcademyHW.Data;
@@ -10,6 +11,12 @@ builder.Services.AddDbContextFactory<BlazorAcademyHWContext>(options =>
 builder.Services.AddQuickGridEntityFrameworkAdapter();
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+// Настройка максимального размера загружаемого файла
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 50 * 1024 * 1024; // 50 МБ
+});
 
 // Add services to the container.
 builder.Services.AddRazorComponents()

@@ -8,24 +8,39 @@
 <h3>Teacher Details</h3>
 @if (teacher != null)
 {
-    <dl class="row">
-        <dt class="col-sm-2">Last Name</dt>
-        <dd class="col-sm-10">@teacher.LastName</dd>
-        <dt class="col-sm-2">First Name</dt>
-        <dd class="col-sm-10">@teacher.FirstName</dd>
-        <dt class="col-sm-2">Middle Name</dt>
-        <dd class="col-sm-10">@teacher.MiddleName</dd>
-        <dt class="col-sm-2">Birth Date</dt>
-        <dd class="col-sm-10">@teacher.BirthDate</dd>
-        <dt class="col-sm-2">Email</dt>
-        <dd class="col-sm-10">@teacher.Email</dd>
-        <dt class="col-sm-2">Phone</dt>
-        <dd class="col-sm-10">@teacher.Phone</dd>
-        <dt class="col-sm-2">Work Since</dt>
-        <dd class="col-sm-10">@teacher.WorkSince</dd>
-        <dt class="col-sm-2">Rate</dt>
-        <dd class="col-sm-10">@teacher.Rate</dd>
-    </dl>
+    <div class="row">
+        <div class="col-md-8">
+            <dl class="row">
+                <dt class="col-sm-3">Last Name</dt>
+                <dd class="col-sm-9">@teacher.LastName</dd>
+                <dt class="col-sm-3">First Name</dt>
+                <dd class="col-sm-9">@teacher.FirstName</dd>
+                <dt class="col-sm-3">Middle Name</dt>
+                <dd class="col-sm-9">@teacher.MiddleName</dd>
+                <dt class="col-sm-3">Birth Date</dt>
+                <dd class="col-sm-9">@teacher.BirthDate</dd>
+                <dt class="col-sm-3">Email</dt>
+                <dd class="col-sm-9">@teacher.Email</dd>
+                <dt class="col-sm-3">Phone</dt>
+                <dd class="col-sm-9">@teacher.Phone</dd>
+                <dt class="col-sm-3">Work Since</dt>
+                <dd class="col-sm-9">@teacher.WorkSince</dd>
+                <dt class="col-sm-3">Rate</dt>
+                <dd class="col-sm-9">@teacher.Rate</dd>
+            </dl>
+        </div>
+        <div class="col-md-4">
+            @if (teacher.Photo != null && teacher.Photo.Length > 0)
+            {
+                <img src="data:image/png;base64,@Convert.ToBase64String(teacher.Photo)"
+                     alt="Teacher photo" class="img-fluid rounded" style="max-width: 250px;" />
+            }
+            else
+            {
+                <p class="text-muted">No photo</p>
+            }
+        </div>
+    </div>
     
     <h4 class="mt-4">Disciplines this teacher can teach:</h4>
     @if (teacher.TeacherDisciplines != null && teacher.TeacherDisciplines.Any())

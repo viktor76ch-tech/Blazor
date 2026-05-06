@@ -27,83 +27,88 @@ else
 {
     <div class="row">
         <div class="col-md-6">
-            <div class="mb-3">
-                <label class="form-label">Last Name:</label>
-                <InputText class="form-control" @bind-Value="lastName" />
-            </div>
-            
-            <div class="mb-3">
-                <label class="form-label">First Name:</label>
-                <InputText class="form-control" @bind-Value="firstName" />
-            </div>
-            
-            <div class="mb-3">
-                <label class="form-label">Middle Name:</label>
-                <InputText class="form-control" @bind-Value="middleName" />
-            </div>
-            
-            <div class="mb-3">
-                <label class="form-label">Birth Date:</label>
-                <InputDate class="form-control" @bind-Value="birthDate" />
-            </div>
-            
-            <div class="mb-3">
-                <label class="form-label">Email:</label>
-                <InputText class="form-control" @bind-Value="email" type="email" />
-            </div>
-            
-            <div class="mb-3">
-                <label class="form-label">Phone:</label>
-                <InputText class="form-control" @bind-Value="phone" type="tel" />
-            </div>
-            
-            <div class="mb-3">
-                <label class="form-label">Work Since:</label>
-                <InputDate class="form-control" @bind-Value="workSince" />
-            </div>
-            
-            <div class="mb-3">
-                <label class="form-label">Rate:</label>
-                <InputNumber class="form-control" @bind-Value="rate" />
-            </div>
-            
-            <!-- ДОБАВЛЕНО: текущее фото -->
-            <div class="mb-3">
-                <label class="form-label">Current Photo:</label>
-                @if (currentPhoto != null)
-                {
-                    <div class="mb-2">
-                        <img src="data:image/png;base64,@Convert.ToBase64String(currentPhoto)"
-                             alt="Current photo" style="max-width: 200px;" />
-                    </div>
-                    <div class="form-check mb-2">
-                        <input class="form-check-input" type="checkbox" id="removePhoto" @bind="removePhoto" />
-                        <label class="form-check-label" for="removePhoto">Remove current photo</label>
-                    </div>
-                }
-                else
-                {
-                    <p>No photo</p>
-                }
-            </div>
-            
-            <!-- ДОБАВЛЕНО: новое фото -->
-            <div class="mb-3">
-                <label class="form-label">New Photo:</label>
-                <InputFile OnChange="OnInputFileChange" accept="image/*" />
-                @if (previewUrl != null)
-                {
-                    <div class="mt-2">
-                        <p>New photo preview:</p>
-                        <img src="@previewUrl" alt="Preview" style="max-width: 200px;" />
-                    </div>
-                }
-            </div>
-            
-            <div class="mb-3">
-                <button class="btn btn-primary" @onclick="UpdateTeacher">Save</button>
-                <a href="/teachers" class="btn btn-secondary ms-2">Cancel</a>
-            </div>
+            <EditForm Model="teacher" OnValidSubmit="UpdateTeacher" FormName="edit-teacher">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                
+                <div class="mb-3">
+                    <label class="form-label">Last Name:</label>
+                    <InputText class="form-control" @bind-Value="lastName" />
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">First Name:</label>
+                    <InputText class="form-control" @bind-Value="firstName" />
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Middle Name:</label>
+                    <InputText class="form-control" @bind-Value="middleName" />
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Birth Date:</label>
+                    <InputDate class="form-control" @bind-Value="birthDate" />
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Email:</label>
+                    <InputText class="form-control" @bind-Value="email" type="email" />
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Phone:</label>
+                    <InputText class="form-control" @bind-Value="phone" type="tel" />
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Work Since:</label>
+                    <InputDate class="form-control" @bind-Value="workSince" />
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Rate:</label>
+                    <InputNumber class="form-control" @bind-Value="rate" />
+                </div>
+                
+                <!-- Текущее фото -->
+                <div class="mb-3">
+                    <label class="form-label">Current Photo:</label>
+                    @if (currentPhoto != null && currentPhoto.Length > 0)
+                    {
+                        <div class="mb-2">
+                            <img src="data:image/png;base64,@Convert.ToBase64String(currentPhoto)"
+                                 alt="Current photo" style="max-width: 200px;" />
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="removePhoto" @bind="removePhoto" />
+                            <label class="form-check-label" for="removePhoto">Remove photo</label>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted">No photo</p>
+                    }
+                </div>
+                
+                <!-- Новое фото -->
+                <div class="mb-3">
+                    <label class="form-label">New Photo:</label>
+                    <InputFile OnChange="OnInputFileChange" accept="image/*" />
+                    @if (previewUrl != null)
+                    {
+                        <div class="mt-2">
+                            <p>Preview:</p>
+                            <img src="@previewUrl" alt="Preview" style="max-width: 200px;" />
+                        </div>
+                    }
+                </div>
+                
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <a href="/teachers" class="btn btn-secondary ms-2">Cancel</a>
+                </div>
+            </EditForm>
         </div>
     </div>
 }
@@ -179,7 +184,7 @@ else
             teacherInDb.WorkSince = workSince;
             teacherInDb.Rate = rate;
             
-            // ДОБАВЛЕНО: обработка фото
+            // Обработка фото
             if (removePhoto)
             {
                 teacherInDb.Photo = null;
