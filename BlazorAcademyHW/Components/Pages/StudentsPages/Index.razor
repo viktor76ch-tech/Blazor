@@ -46,14 +46,15 @@
 
 @if (studentsQuery != null)
 {
-    <QuickGrid Class="table" Items="studentsQuery">
+<div>
+    <QuickGrid Class="table" Items="studentsQuery" Pagination="pagination">
         <PropertyColumn Property="s => s.LastName" Sortable="true" />
         <PropertyColumn Property="s => s.FirstName" Sortable="true" />
-        <PropertyColumn Property="s => s.MiddleName" />
-        <PropertyColumn Property="s => s.BirthDate" Format="dd.MM.yyyy" />
-        <PropertyColumn Property="s => s.Email" />
-        <PropertyColumn Property="s => s.Phone" />
-        <TemplateColumn Title="Group">
+        <PropertyColumn Property="s => s.MiddleName" Sortable="true" />
+        <PropertyColumn Property="s => s.BirthDate" Format="dd.MM.yyyy" Sortable="true" />
+        <PropertyColumn Property="s => s.Email" Sortable="true" />
+        <PropertyColumn Property="s => s.Phone" Sortable="true" />
+        <TemplateColumn Title="Group" Sortable="true">
             @(context.GroupNm?.GroupName ?? "No group")
         </TemplateColumn>
         <TemplateColumn Context="student">
@@ -62,6 +63,8 @@
             <a href="@($"students/delete?studid={student.StudId}")">Delete</a>
         </TemplateColumn>
     </QuickGrid>
+</div>
+    <Paginator State="pagination" />
 }
 else
 {
@@ -76,6 +79,7 @@ else
     private IQueryable<Students>? studentsQuery;
     private List<Groups>? groups;
     private List<Directions>? directions;
+    private PaginationState pagination = new() { ItemsPerPage = 10 };
     
     private int? selectedGroupId = null;
     private byte? selectedDirectionId = null;
