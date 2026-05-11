@@ -15,46 +15,44 @@
     <a href="groups/create">Create New</a>
 </p>
 
+<div class="col-md-4">
+    <label class="form-label">Filter by Direction:</label>
+    <select class="form-select" @bind="selectedDirectionId" @bind:after="ApplyFilter">
+        <option value="">All Direction</option>
+        @if (directions != null)
+        {
+            @foreach (var direction in directions)
+            {
+                <option value="@direction.DirectionId">@direction.DirectionName</option>
+            }
+        }
+    </select>
+</div>
+
 @if (groupsQuery != null)
 {
-    <QuickGrid Class="table" Items="groupsQuery">
-        <PropertyColumn Property="g => g.GroupName" Sortable="true" />
-        
-        <TemplateColumn Title="Direction" Sortable="false">
-            <HeaderTemplate>
-                <div class="d-flex align-items-center">
-                    <span class="me-1 fw-bold">Direction</span>
-                    <select class="form-select form-select-sm border-0 bg-transparent"
-                            @bind="selectedDirectionId"
-                            @bind:after="ApplyFilter"
-                            style="width: 20px; cursor: pointer; appearance: auto; padding: 0; background: none;">
-                        <option value="">▼</option>
-                        <option value="">All Directions</option>
-                        @if (directions != null)
-                        {
-                            @foreach (var direction in directions)
-                            {
-                                <option value="@direction.DirectionId">@direction.DirectionName</option>
-                            }
-                        }
-                    </select>
-                </div>
-            </HeaderTemplate>
-            <ChildContent>
-                @(context.DirectionNavigation?.DirectionName ?? "No direction")
-            </ChildContent>
-        </TemplateColumn>
-        
-        <TemplateColumn Title="Schedule" Sortable="false">
-            @GetScheduleString(context)
-        </TemplateColumn>
-        
-        <TemplateColumn Context="group">
-            <a href="@($"groups/edit?groupid={group.GroupId}")">Edit</a> |
-            <a href="@($"groups/details?groupid={group.GroupId}")">Details</a> |
-            <a href="@($"groups/delete?groupid={group.GroupId}")">Delete</a>
-        </TemplateColumn>
-    </QuickGrid>
+    <div>
+        <QuickGrid Class="table" Items="groupsQuery" Pagination="pagination">
+            <PropertyColumn Property="g => g.GroupName" Sortable="true" />
+
+            <TemplateColumn Title="Direction" SortBy="@(x => x.Direction)">
+                <ChildContent>
+                    @(context.DirectionNavigation?.DirectionName ?? "No direction")
+                </ChildContent>
+            </TemplateColumn>
+
+            <TemplateColumn Title="Schedule" Sortable="false">
+                @GetScheduleString(context)
+            </TemplateColumn>
+
+            <TemplateColumn Context="group">
+                <a href="@($"groups/edit?groupid={group.GroupId}")">Edit</a> |
+                <a href="@($"groups/details?groupid={group.GroupId}")">Details</a> |
+                <a href="@($"groups/delete?groupid={group.GroupId}")">Delete</a>
+            </TemplateColumn>
+        </QuickGrid>
+    </div>
+    <Paginator State="pagination" />
 }
 else
 {
@@ -67,7 +65,8 @@ else
     private BlazorAcademyHWContext context = default!;
     private IQueryable<Groups>? groupsQuery;
     private List<Directions>? directions;
-    
+    private PaginationState pagination = new() { ItemsPerPage = 10 };
+
     private byte? selectedDirectionId = null;
 
     protected override async Task OnInitializedAsync()
