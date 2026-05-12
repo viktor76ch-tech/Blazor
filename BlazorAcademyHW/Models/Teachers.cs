@@ -21,7 +21,20 @@ namespace BlazorAcademyHW.Models
         public string? MiddleName { get; set; }
 
         [Column("birth_date")]
-        public DateOnly? BirthDate { get; set; }
+        public DateTime BirthDate { get; set; }
+
+        [NotMapped]
+        public int Age
+        {
+            get
+            {
+                DateTime today = DateTime.Today;
+                int age = today.Year - BirthDate.Year;
+                if (BirthDate.Date > today.AddYears(-age))
+                    age--;
+                return age;
+            }
+        }
 
         [Column("email")]
         public string? Email { get; set; }
