@@ -5,6 +5,7 @@
 @using BlazorAcademyHW.Data
 @implements IAsyncDisposable
 @inject IDbContextFactory<BlazorAcademyHW.Data.BlazorAcademyHWContext> DbFactory
+@rendermode InteractiveServer
 
 <PageTitle>Index</PageTitle>
 
@@ -14,18 +15,22 @@
     <a href="directions/create">Create New</a>
 </p>
 
-<QuickGrid Class="table" Items="context.Directions">
-    <PropertyColumn Property="directions => directions.DirectionName" />
+<div>
+    <QuickGrid Class="table" Items="context.Directions" Pagination="pagination">
+        <PropertyColumn Property="directions => directions.DirectionName" Sortable="true" />
 
-    <TemplateColumn Context="directions">
-        <a href="@($"directions/edit?directionid={directions.DirectionId}")">Edit</a> |
-        <a href="@($"directions/details?directionid={directions.DirectionId}")">Details</a> |
-        <a href="@($"directions/delete?directionid={directions.DirectionId}")">Delete</a>
-    </TemplateColumn>
-</QuickGrid>
+        <TemplateColumn Context="directions">
+            <a href="@($"directions/edit?directionid={directions.DirectionId}")">Edit</a> |
+            <a href="@($"directions/details?directionid={directions.DirectionId}")">Details</a> |
+            <a href="@($"directions/delete?directionid={directions.DirectionId}")">Delete</a>
+        </TemplateColumn>
+    </QuickGrid>
+    <Paginator State="pagination" />
+</div>
 
 @code {
     private BlazorAcademyHWContext context = default!;
+    private PaginationState pagination = new() { ItemsPerPage = 3 };
 
     protected override void OnInitialized()
     {

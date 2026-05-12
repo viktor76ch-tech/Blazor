@@ -24,7 +24,7 @@
             <dd class="col-sm-9">@group.GroupName</dd>
             
             <dt class="col-sm-3">Direction</dt>
-            <dd class="col-sm-9">@(group.DirectionNavigation?.DirectionName ?? "No direction")</dd>
+            <dd class="col-sm-9">@(group.DirectionNM?.DirectionName ?? "No direction")</dd>
         </dl>
         
         <EditForm Model="group" OnValidSubmit="DeleteGroups" FormName="delete-group">
@@ -44,7 +44,7 @@
     {
         using var context = await DbFactory.CreateDbContextAsync();
         group = await context.Groups
-            .Include(g => g.DirectionNavigation)
+            .Include(g => g.DirectionNM)
             .FirstOrDefaultAsync(m => m.GroupId == GroupId);
 
         if (group is null)

@@ -34,12 +34,7 @@
     <div>
         <QuickGrid Class="table" Items="groupsQuery" Pagination="pagination">
             <PropertyColumn Property="g => g.GroupName" Sortable="true" />
-
-            <TemplateColumn Title="Direction" SortBy="@(x => x.Direction)">
-                <ChildContent>
-                    @(context.DirectionNavigation?.DirectionName ?? "No direction")
-                </ChildContent>
-            </TemplateColumn>
+            <PropertyColumn Property="g => g.DirectionNM.DirectionName" Sortable="true" />
 
             <TemplateColumn Title="Schedule" Sortable="false">
                 @GetScheduleString(context)
@@ -65,7 +60,7 @@ else
     private BlazorAcademyHWContext context = default!;
     private IQueryable<Groups>? groupsQuery;
     private List<Directions>? directions;
-    private PaginationState pagination = new() { ItemsPerPage = 10 };
+    private PaginationState pagination = new() { ItemsPerPage = 3 };
 
     private byte? selectedDirectionId = null;
 
@@ -80,7 +75,7 @@ else
     private void ApplyFilter()
     {
         var query = context.Groups
-            .Include(g => g.DirectionNavigation)
+            .Include(g => g.DirectionNM)
             .Include(g => g.ScheduleDays)
             .AsQueryable();
         

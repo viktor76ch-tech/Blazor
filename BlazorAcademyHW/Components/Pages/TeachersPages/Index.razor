@@ -5,6 +5,7 @@
 @using BlazorAcademyHW.Data
 @implements IAsyncDisposable
 @inject IDbContextFactory<BlazorAcademyHW.Data.BlazorAcademyHWContext> DbFactory
+@rendermode InteractiveServer
 
 <PageTitle>Index</PageTitle>
 
@@ -14,26 +15,30 @@
     <a href="teachers/create">Create New</a>
 </p>
 
-<QuickGrid Class="table" Items="context.Teachers">
-    <PropertyColumn Property="teachers => teachers.LastName" />
-    <PropertyColumn Property="teachers => teachers.FirstName" />
-    <PropertyColumn Property="teachers => teachers.MiddleName" />
-    <PropertyColumn Property="teachers => teachers.BirthDate" />
-    <PropertyColumn Property="teachers => teachers.Email" />
-    <PropertyColumn Property="teachers => teachers.Phone" />
-    <PropertyColumn Property="teachers => teachers.Photo" />
-    <PropertyColumn Property="teachers => teachers.WorkSince" />
-    <PropertyColumn Property="teachers => teachers.Rate" />
+<div>
+    <QuickGrid Class="table" Items="context.Teachers" Pagination="pagination">
+        <PropertyColumn Property="teachers => teachers.LastName" Sortable="true" />
+        <PropertyColumn Property="teachers => teachers.FirstName" Sortable="true" />
+        <PropertyColumn Property="teachers => teachers.MiddleName" Sortable="true" />
+        <PropertyColumn Property="teachers => teachers.BirthDate" Sortable="true" />
+        <PropertyColumn Property="teachers => teachers.Email" Sortable="true" />
+        <PropertyColumn Property="teachers => teachers.Phone" Sortable="true" />
+        <PropertyColumn Property="teachers => teachers.Photo" />
+        <PropertyColumn Property="teachers => teachers.WorkSince" Sortable="true" />
+        <PropertyColumn Property="teachers => teachers.Rate" Sortable="true" />
 
-    <TemplateColumn Context="teachers">
-        <a href="@($"teachers/edit?teacherid={teachers.TeacherId}")">Edit</a> |
-        <a href="@($"teachers/details?teacherid={teachers.TeacherId}")">Details</a> |
-        <a href="@($"teachers/delete?teacherid={teachers.TeacherId}")">Delete</a>
-    </TemplateColumn>
-</QuickGrid>
+        <TemplateColumn Context="teachers">
+            <a href="@($"teachers/edit?teacherid={teachers.TeacherId}")">Edit</a> |
+            <a href="@($"teachers/details?teacherid={teachers.TeacherId}")">Details</a> |
+            <a href="@($"teachers/delete?teacherid={teachers.TeacherId}")">Delete</a>
+        </TemplateColumn>
+    </QuickGrid>
+    <Paginator State="pagination" />
+</div>
 
 @code {
     private BlazorAcademyHWContext context = default!;
+    private PaginationState pagination = new() { ItemsPerPage = 3 };
 
     protected override void OnInitialized()
     {

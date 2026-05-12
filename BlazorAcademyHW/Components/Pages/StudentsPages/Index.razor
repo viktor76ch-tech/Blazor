@@ -44,8 +44,8 @@
     </div>
 </div>
 
-@if (studentsQuery != null)
-{
+@* @if (studentsQuery != null)
+{ *@
 <div>
     <QuickGrid Class="table" Items="studentsQuery" Pagination="pagination">
         <PropertyColumn Property="s => s.LastName" Sortable="true" />
@@ -54,24 +54,23 @@
         <PropertyColumn Property="s => s.BirthDate" Format="dd.MM.yyyy" Sortable="true" />
         <PropertyColumn Property="s => s.Email" Sortable="true" />
         <PropertyColumn Property="s => s.Phone" Sortable="true" />
-        <TemplateColumn Title="Group" Sortable="true">
-            @(context.GroupNm?.GroupName ?? "No group")
-        </TemplateColumn>
+        <PropertyColumn Property="s => s.GroupNm.GroupName" Sortable="true" />
         <TemplateColumn Context="student">
             <a href="@($"students/edit?studid={student.StudId}")">Edit</a> |
             <a href="@($"students/details?studid={student.StudId}")">Details</a> |
             <a href="@($"students/delete?studid={student.StudId}")">Delete</a>
         </TemplateColumn>
     </QuickGrid>
-</div>
     <Paginator State="pagination" />
-}
-else
+</div>
+@* }
+ *@
+ @* else
 {
     <div class="alert alert-info">
         <em>Loading...</em>
     </div>
-}
+} *@
 
 @code {
     private BlazorAcademyHWContext context = default!;

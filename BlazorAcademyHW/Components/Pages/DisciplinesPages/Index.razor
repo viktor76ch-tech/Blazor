@@ -5,6 +5,7 @@
 @using BlazorAcademyHW.Data
 @implements IAsyncDisposable
 @inject IDbContextFactory<BlazorAcademyHW.Data.BlazorAcademyHWContext> DbFactory
+@rendermode InteractiveServer
 
 <PageTitle>Index</PageTitle>
 
@@ -14,19 +15,23 @@
     <a href="disciplines/create">Create New</a>
 </p>
 
-<QuickGrid Class="table" Items="context.Disciplines">
-    <PropertyColumn Property="disciplines => disciplines.DisciplineName" />
-    <PropertyColumn Property="disciplines => disciplines.NumberOfLessons" />
+<div>
+    <QuickGrid Class="table" Items="context.Disciplines" Pagination="pagination">
+        <PropertyColumn Property="disciplines => disciplines.DisciplineName" Sortable="true" />
+        <PropertyColumn Property="disciplines => disciplines.NumberOfLessons" Sortable="true" />
 
-    <TemplateColumn Context="disciplines">
-        <a href="@($"disciplines/edit?disciplineid={disciplines.DisciplineId}")">Edit</a> |
-        <a href="@($"disciplines/details?disciplineid={disciplines.DisciplineId}")">Details</a> |
-        <a href="@($"disciplines/delete?disciplineid={disciplines.DisciplineId}")">Delete</a>
-    </TemplateColumn>
-</QuickGrid>
+        <TemplateColumn Context="disciplines">
+            <a href="@($"disciplines/edit?disciplineid={disciplines.DisciplineId}")">Edit</a> |
+            <a href="@($"disciplines/details?disciplineid={disciplines.DisciplineId}")">Details</a> |
+            <a href="@($"disciplines/delete?disciplineid={disciplines.DisciplineId}")">Delete</a>
+        </TemplateColumn>
+    </QuickGrid>
+    <Paginator State="pagination" />
+</div>
 
 @code {
     private BlazorAcademyHWContext context = default!;
+    private PaginationState pagination = new() { ItemsPerPage = 10 };
 
     protected override void OnInitialized()
     {

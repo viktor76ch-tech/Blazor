@@ -16,15 +16,8 @@ namespace BlazorAcademyHW.Models
         [Column("direction")]
         public byte? Direction { get; set; }
 
-        [NotMapped]
-        public int DirectionInput
-        {
-            get => Direction ?? 0;
-            set => Direction = (byte)Math.Clamp(value, 0, 255);
-        }
-
         [ForeignKey(nameof(Direction))]
-        public Directions? DirectionNavigation { get; set; }
+        public virtual Directions? DirectionNM { get; set; }
 
         public ICollection<GroupScheduleDays>? ScheduleDays { get; set; }
     }

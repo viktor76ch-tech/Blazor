@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.RegularExpressions;
 
 namespace BlazorAcademyHW.Models
 {
@@ -37,7 +38,7 @@ namespace BlazorAcademyHW.Models
         [Column("group")]
         public int? Group { get; set; }
 
-        [ForeignKey("Group")]
-        public Groups? GroupNm { get; set; }
+        [ForeignKey(nameof(Group))]
+        public virtual Groups? GroupNm { get; set; }
     }
 }
